@@ -9,7 +9,7 @@ Usage:
 Then open slam-auction-interactive.html in your browser.
 """
 
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, send_file
 from flask_cors import CORS
 import requests
 import os
@@ -19,6 +19,11 @@ CORS(app)  # Enable CORS for all routes
 
 # You can set this as an environment variable or hardcode it (less secure)
 ANTHROPIC_API_KEY = os.environ.get('ANTHROPIC_API_KEY', '')
+
+@app.route('/')
+def index():
+    """Serve the main HTML file."""
+    return send_file('slam-auction-interactive.html')
 
 @app.route('/api/bid', methods=['POST'])
 def get_bid():

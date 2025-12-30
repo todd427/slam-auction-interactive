@@ -70,12 +70,30 @@
           }
         ];
 
-        // Bid options
+        // Bid options with colors
         const BID_OPTIONS = [
-          'Pass', 'X', '1C', '1D', '1H', '1S', '1NT',
-          '2C', '2D', '2H', '2S', '2NT',
-          '3C', '3D', '3H', '3S', '3NT',
-          '4C', '4D', '4H', '4S', '4NT'
+          { label: 'Pass', value: 'Pass', color: 'gray' },
+          { label: 'X', value: 'X', color: 'double' },
+          { label: '1♣', value: '1C', color: 'club' },
+          { label: '1♦', value: '1D', color: 'diamond' },
+          { label: '1♥', value: '1H', color: 'heart' },
+          { label: '1♠', value: '1S', color: 'spade' },
+          { label: '1NT', value: '1NT', color: 'nt' },
+          { label: '2♣', value: '2C', color: 'club' },
+          { label: '2♦', value: '2D', color: 'diamond' },
+          { label: '2♥', value: '2H', color: 'heart' },
+          { label: '2♠', value: '2S', color: 'spade' },
+          { label: '2NT', value: '2NT', color: 'nt' },
+          { label: '3♣', value: '3C', color: 'club' },
+          { label: '3♦', value: '3D', color: 'diamond' },
+          { label: '3♥', value: '3H', color: 'heart' },
+          { label: '3♠', value: '3S', color: 'spade' },
+          { label: '3NT', value: '3NT', color: 'nt' },
+          { label: '4♣', value: '4C', color: 'club' },
+          { label: '4♦', value: '4D', color: 'diamond' },
+          { label: '4♥', value: '4H', color: 'heart' },
+          { label: '4♠', value: '4S', color: 'spade' },
+          { label: '4NT', value: '4NT', color: 'nt' }
         ];
 
         const App = () => {
@@ -88,6 +106,54 @@
             }}>
               <AuctionTrainer />
             </div>
+          );
+        };
+
+        const BidButton = ({ bid, onClick, disabled = false }) => {
+          const [isHovered, setIsHovered] = useState(false);
+
+          const getColorScheme = (color) => {
+            const schemes = {
+              gray: { bg: 'rgba(148, 163, 184, 0.1)', border: 'rgba(148, 163, 184, 0.3)', text: '#cbd5e1' },
+              club: { bg: 'rgba(22, 101, 52, 0.2)', border: 'rgba(74, 222, 128, 0.4)', text: '#4ade80' },
+              diamond: { bg: 'rgba(234, 88, 12, 0.2)', border: 'rgba(251, 146, 60, 0.4)', text: '#fb923c' },
+              heart: { bg: 'rgba(220, 38, 38, 0.2)', border: 'rgba(248, 113, 113, 0.4)', text: '#f87171' },
+              spade: { bg: 'rgba(15, 20, 25, 0.4)', border: 'rgba(226, 232, 240, 0.4)', text: '#e2e8f0' },
+              nt: { bg: 'rgba(59, 130, 246, 0.2)', border: 'rgba(96, 165, 250, 0.4)', text: '#60a5fa' },
+              double: { bg: 'rgba(251, 146, 60, 0.2)', border: 'rgba(251, 146, 60, 0.4)', text: '#fb923c' }
+            };
+            return schemes[color] || schemes.gray;
+          };
+
+          const colors = getColorScheme(bid.color);
+
+          return (
+            <button
+              onClick={disabled ? null : onClick}
+              onMouseEnter={() => !disabled && setIsHovered(true)}
+              onMouseLeave={() => setIsHovered(false)}
+              disabled={disabled}
+              style={{
+                background: disabled 
+                  ? 'rgba(255, 255, 255, 0.02)' 
+                  : isHovered ? colors.bg : 'rgba(255, 255, 255, 0.05)',
+                border: `2px solid ${disabled 
+                  ? 'rgba(255, 255, 255, 0.05)' 
+                  : isHovered ? colors.border : 'rgba(255, 255, 255, 0.1)'}`,
+                borderRadius: '8px',
+                padding: '12px 8px',
+                color: disabled ? 'rgba(255, 255, 255, 0.2)' : colors.text,
+                fontSize: '16px',
+                fontWeight: '600',
+                cursor: disabled ? 'not-allowed' : 'pointer',
+                transition: 'all 0.2s',
+                opacity: disabled ? 0.3 : 1,
+                transform: isHovered && !disabled ? 'translateY(-2px)' : 'translateY(0)',
+                boxShadow: isHovered && !disabled ? `0 4px 12px ${colors.border}` : 'none'
+              }}
+            >
+              {bid.label}
+            </button>
           );
         };
 
@@ -370,35 +436,12 @@ The bid must be legal (higher than the last bid or Pass). Make realistic bids th
                     gap: '8px'
                   }}>
                     {BID_OPTIONS.map(bid => (
-                      <button
-                        key={bid}
-                        onClick={() => handleUserBid(bid)}
-                        disabled={!isBidLegal(bid)}
-                        style={{
-                          padding: '12px 8px',
-                          background: isBidLegal(bid) ? 'rgba(74, 222, 128, 0.2)' : 'rgba(255, 255, 255, 0.02)',
-                          border: `2px solid ${isBidLegal(bid) ? 'rgba(74, 222, 128, 0.4)' : 'rgba(255, 255, 255, 0.05)'}`,
-                          borderRadius: '8px',
-                          color: isBidLegal(bid) ? '#4ade80' : 'rgba(255, 255, 255, 0.2)',
-                          fontSize: '16px',
-                          fontWeight: '600',
-                          cursor: isBidLegal(bid) ? 'pointer' : 'not-allowed',
-                          transition: 'all 0.2s',
-                          opacity: isBidLegal(bid) ? 1 : 0.3
-                        }}
-                        onMouseEnter={e => {
-                          if (isBidLegal(bid)) {
-                            e.target.style.transform = 'translateY(-2px)';
-                            e.target.style.boxShadow = '0 4px 12px rgba(74, 222, 128, 0.3)';
-                          }
-                        }}
-                        onMouseLeave={e => {
-                          e.target.style.transform = 'translateY(0)';
-                          e.target.style.boxShadow = 'none';
-                        }}
-                      >
-                        {formatBid(bid)}
-                      </button>
+                      <BidButton
+                        key={bid.value}
+                        bid={bid}
+                        onClick={() => handleUserBid(bid.value)}
+                        disabled={!isBidLegal(bid.value)}
+                      />
                     ))}
                   </div>
                 </div>
