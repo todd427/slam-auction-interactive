@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SLAM Auction Interactive - Bridge Bidding Trainer</title>
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { margin: 0; font-family: 'DM Sans', -apple-system, sans-serif; }
+        #root { min-height: 100vh; }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+
+        // Utility functions
+        const formatBid = (bid) => {
+          if (bid === 'Pass') return 'Pass';
+          if (bid === 'X') return 'X';
+          if (bid === 'XX') return 'XX';
+          const suits = { C: '♣', D: '♦', H: '♥', S: '♠' };
+          const level = bid.charAt(0);
+          const suit = bid.substring(1);
+          return suit === 'NT' ? `${level}NT` : `${level}${suits[suit]}`;
+        };
+
+        const getNextSeat = (seat) => {
+          const seats = ['N', 'E', 'S', 'W'];
+          return seats[(seats.indexOf(seat) + 1) % 4];
+        };
+
+        // Training scenarios with all 4 hands
+        const SCENARIOS = [
+          {
+            id: "INT01",
+            title: "Stayman after 1NT",
+            dealer: "N",
+            vul: "None",
+            your_seat: "S",
+            hands: {
+              N: { S: "A105", H: "KQ84", D: "AQ6", C: "K73" },
+              E: { S: "9632", H: "J105", D: "10984", C: "Q4" },
+              S: { S: "KJ84", H: "A963", D: "K72", C: "85" },
+              W: { S: "Q7", H: "72", D: "J53", C: "AJ10962" }
+            },
+            teaching_point: "Use Stayman (2♣) to find 4-4 major fit after partner's 1NT opening",
+            optimal_contract: "4H by N"
+          },
+          {
+            id: "INT02",
+            title: "Responding to 1 of a Major",
+            dealer: "S",
+            vul: "None",
+            your_seat: "N",
+            hands: {
+              N: { S: "K84", H: "AJ63", D: "Q72", C: "K85" },
+              E: { S: "9632", H: "Q105", D: "J984", C: "Q4" },
+              S: { S: "AQJ105", H: "K84", D: "A6", C: "A73" },
+              W: { S: "7", H: "972", D: "K1053", C: "J10962" }
+            },
+            teaching_point: "With 4-card support and 11 HCP, make an invitational raise to 3",
+            optimal_contract: "4S by S"
+          }
+        ];
+
+        // Bid options
+        const BID_OPTIONS = [
+          'Pass', 'X', '1C', '1D', '1H', '1S', '1NT',
+          '2C', '2D', '2H', '2S', '2NT',
+          '3C', '3D', '3H', '3S', '3NT',
+          '4C', '4D', '4H', '4S', '4NT'
+        ];
+
+        const App = () => {
+          return (
+            <div style={{
+              minHeight: '100vh',
+              background: 'linear-gradient(135deg, #0f1419 0%, #1a2332 100%)',
+              color: '#e8edf2',
+              padding: '40px 20px'
+            }}>
+              <AuctionTrainer />
+            </div>
+          );
+        };
+
+        const AuctionTrainer = () => {
+          const [scenario] = useState(SCENARIOS[0]);
+          const [auction, setAuction] = useState([
+            // Start with dealer's opening bid
+            { seat: 'N', bid: '1NT', reasoning: '15-17 HCP, balanced' }
+          ]);
+          const [currentSeat, setCurrentSeat] = useState('E'); // Start with seat after dealer
+          const [isThinking, setIsThinking] = useState(false);
+          const [auctionComplete, setAuctionComplete] = useState(false);
+          const [finalContract, setFinalContract] = useState(null);
+
+          // Check if auction is complete (3 consecutive passes)
+          const checkAuctionComplete = (auctionBids) => {
+            if (auctionBids.length < 4) return false;
+            const last3 = auctionBids.slice(-3);
+            return last3.every(b => b.bid === 'Pass');
+          };
+
+          // Get Claude to bid for other players (via backend)
+          const getClaudeBid = async (seat) => {
+            setIsThinking(true);
+            
+            try {
+              const auctionStr = auction.map(b => `${b.seat}: ${b.bid}`).join(', ');
+              const handStr = `North: Spades ${scenario.hands.N.S}, Hearts ${scenario.hands.N.H}, Diamonds ${scenario.hands.N.D}, Clubs ${scenario.hands.N.C}
+East: Spades ${scenario.hands.E.S}, Hearts ${scenario.hands.E.H}, Diamonds ${scenario.hands.E.D}, Clubs ${scenario.hands.E.C}
+South: Spades ${scenario.hands.S.S}, Hearts ${scenario.hands.S.H}, Diamonds ${scenario.hands.S.D}, Clubs ${scenario.hands.S.C}
+West: Spades ${scenario.hands.W.S}, Hearts ${scenario.hands.W.H}, Diamonds ${scenario.hands.W.D}, Clubs ${scenario.hands.W.C}`;
+              
+              const prompt = `You are playing bridge as seat ${seat}. You can see all 4 hands (this is a training scenario).
+
+**All Hands:**
+${handStr}
+
+**Auction so far:** ${auctionStr}
+**Dealer:** ${scenario.dealer}
+**Vulnerability:** ${scenario.vul}
+**Your seat:** ${seat}
+**Your hand:** Spades: ${scenario.hands[seat].S}, Hearts: ${scenario.hands[seat].H}, Diamonds: ${scenario.hands[seat].D}, Clubs: ${scenario.hands[seat].C}
+
+**Teaching point:** ${scenario.teaching_point}
+**Optimal contract:** ${scenario.optimal_contract}
+
+What should ${seat} bid? Respond with ONLY a JSON object (no markdown, no backticks, just pure JSON):
+{"bid": "Pass", "reasoning": "Brief explanation"}
+
+The bid must be legal (higher than the last bid or Pass). Make realistic bids that help guide the student toward the optimal contract.`;
+
+              console.log('Calling backend API for seat:', seat);
+              
+              // Call our backend instead of Anthropic directly
+              const response = await fetch("http://localhost:5000/api/bid", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ prompt })
+              });
+
+              if (!response.ok) {
+                throw new Error(`Backend error: ${response.status}`);
+              }
+
+              const data = await response.json();
+              console.log('Backend API response:', data);
+              
+              if (data.error) {
+                throw new Error(data.error);
+              }
+              
+              const text = data.content.find(c => c.type === "text")?.text || "";
+              console.log('Extracted text:', text);
+              
+              const cleaned = text.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+              const result = JSON.parse(cleaned);
+              
+              console.log('Parsed result:', result);
+              
+              setIsThinking(false);
+              return result;
+              
+            } catch (error) {
+              console.error('Error getting Claude bid:', error);
+              setIsThinking(false);
+              
+              // Better fallback based on position
+              if (seat === scenario.your_seat) {
+                return { bid: 'Pass', reasoning: 'Error - your turn' };
+              }
+              
+              // Opponents usually pass
+              if (seat === 'E' || seat === 'W') {
+                return { bid: 'Pass', reasoning: 'No overcall' };
+              }
+              
+              // Partner - pass for safety
+              return { bid: 'Pass', reasoning: `API error: ${error.message}` };
+            }
+          };
+
+          // Add bid to auction and advance
+          const addBid = (bid, reasoning = '') => {
+            const newAuction = [...auction, { seat: currentSeat, bid, reasoning }];
+            setAuction(newAuction);
+            
+            // Check if complete
+            if (checkAuctionComplete(newAuction)) {
+              setAuctionComplete(true);
+              const lastNonPass = newAuction.slice().reverse().find(b => b.bid !== 'Pass');
+              if (lastNonPass) {
+                setFinalContract(`${formatBid(lastNonPass.bid)} by ${lastNonPass.seat}`);
+              }
+            } else {
+              setCurrentSeat(getNextSeat(currentSeat));
+            }
+          };
+
+          // Handle user's bid
+          const handleUserBid = (bid) => {
+            addBid(bid, 'Your bid');
+          };
+
+          // Auto-bid for other players
+          useEffect(() => {
+            if (!auctionComplete && currentSeat !== scenario.your_seat && !isThinking) {
+              // It's not your turn - Claude bids
+              getClaudeBid(currentSeat).then(result => {
+                addBid(result.bid, result.reasoning);
+              });
+            }
+          }, [currentSeat, auctionComplete]);
+
+          const isYourTurn = currentSeat === scenario.your_seat && !auctionComplete;
+          const lastBid = auction.length > 0 ? auction[auction.length - 1].bid : null;
+
+          // Check if a bid is legal
+          const isBidLegal = (bid) => {
+            if (bid === 'Pass' || bid === 'X') return true;
+            if (!lastBid || lastBid === 'Pass') return true;
+            
+            const getBidValue = (b) => {
+              if (b === 'Pass' || b === 'X') return -1;
+              const level = parseInt(b.charAt(0));
+              const suitOrder = { 'C': 0, 'D': 1, 'H': 2, 'S': 3, 'NT': 4 };
+              const suit = b.substring(1);
+              return level * 5 + (suitOrder[suit] || 0);
+            };
+            
+            return getBidValue(bid) > getBidValue(lastBid);
+          };
+
+          return (
+            <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
+              <h1 style={{
+                fontFamily: "'Playfair Display', serif",
+                fontSize: '48px',
+                marginBottom: '8px',
+                background: 'linear-gradient(135deg, #4ade80 0%, #22d3ee 100%)',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent'
+              }}>
+                SLAM Auction Interactive
+              </h1>
+              <p style={{ color: '#94a3b8', marginBottom: '40px', fontSize: '18px' }}>
+                {scenario.title}
+              </p>
+
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px', marginBottom: '24px' }}>
+                {/* Left: Your Hand */}
+                <div style={{
+                  background: 'rgba(255, 255, 255, 0.03)',
+                  border: '1px solid rgba(255, 255, 255, 0.08)',
+                  borderRadius: '16px',
+                  padding: '24px'
+                }}>
+                  <h3 style={{ marginBottom: '16px', fontSize: '18px' }}>
+                    Your Hand ({scenario.your_seat})
+                  </h3>
+                  <HandDisplay hand={scenario.hands[scenario.your_seat]} />
+                  
+                  <div style={{
+                    marginTop: '20px',
+                    padding: '16px',
+                    background: 'rgba(34, 211, 238, 0.1)',
+                    border: '1px solid rgba(34, 211, 238, 0.3)',
+                    borderRadius: '8px',
+                    fontSize: '14px',
+                    color: '#22d3ee'
+                  }}>
+                    💡 {scenario.teaching_point}
+                  </div>
+                </div>
+
+                {/* Right: Auction */}
+                <div style={{
+                  background: 'rgba(255, 255, 255, 0.03)',
+                  border: '1px solid rgba(255, 255, 255, 0.08)',
+                  borderRadius: '16px',
+                  padding: '24px'
+                }}>
+                  <h3 style={{ marginBottom: '16px', fontSize: '18px' }}>
+                    Auction {auctionComplete && '(Complete)'}
+                  </h3>
+                  
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '20px' }}>
+                    {auction.map((bid, i) => (
+                      <div key={i} style={{
+                        padding: '12px',
+                        background: bid.seat === scenario.your_seat ? 'rgba(74, 222, 128, 0.1)' : 'rgba(255, 255, 255, 0.05)',
+                        border: `1px solid ${bid.seat === scenario.your_seat ? 'rgba(74, 222, 128, 0.3)' : 'rgba(255, 255, 255, 0.1)'}`,
+                        borderRadius: '8px',
+                        display: 'flex',
+                        gap: '12px',
+                        alignItems: 'center'
+                      }}>
+                        <div style={{ fontWeight: '700', minWidth: '24px', color: '#94a3b8' }}>
+                          {bid.seat}
+                        </div>
+                        <div style={{ fontSize: '20px', fontWeight: '700', minWidth: '60px' }}>
+                          {formatBid(bid.bid)}
+                        </div>
+                        {bid.reasoning && (
+                          <div style={{ fontSize: '13px', color: '#94a3b8', fontStyle: 'italic' }}>
+                            {bid.reasoning}
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                    
+                    {isThinking && (
+                      <div style={{
+                        padding: '16px',
+                        background: 'rgba(34, 211, 238, 0.1)',
+                        border: '1px solid rgba(34, 211, 238, 0.3)',
+                        borderRadius: '8px',
+                        textAlign: 'center',
+                        color: '#22d3ee'
+                      }}>
+                        🤔 {currentSeat} is thinking...
+                      </div>
+                    )}
+                  </div>
+
+                  {auctionComplete && finalContract && (
+                    <div style={{
+                      padding: '16px',
+                      background: 'rgba(74, 222, 128, 0.1)',
+                      border: '1px solid rgba(74, 222, 128, 0.3)',
+                      borderRadius: '8px'
+                    }}>
+                      <div style={{ fontSize: '12px', color: '#94a3b8', marginBottom: '6px' }}>
+                        FINAL CONTRACT
+                      </div>
+                      <div style={{ fontSize: '24px', fontWeight: '700', color: '#4ade80' }}>
+                        {finalContract}
+                      </div>
+                      <div style={{ fontSize: '14px', color: '#cbd5e1', marginTop: '8px' }}>
+                        Optimal was: {scenario.optimal_contract}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Bidding Interface */}
+              {isYourTurn && !isThinking && (
+                <div style={{
+                  background: 'rgba(255, 255, 255, 0.03)',
+                  border: '1px solid rgba(255, 255, 255, 0.08)',
+                  borderRadius: '16px',
+                  padding: '24px'
+                }}>
+                  <h3 style={{ marginBottom: '20px', textAlign: 'center', fontSize: '18px' }}>
+                    Your Turn - What's your bid?
+                  </h3>
+                  <div style={{
+                    display: 'grid',
+                    gridTemplateColumns: 'repeat(auto-fill, minmax(70px, 1fr))',
+                    gap: '8px'
+                  }}>
+                    {BID_OPTIONS.map(bid => (
+                      <button
+                        key={bid}
+                        onClick={() => handleUserBid(bid)}
+                        disabled={!isBidLegal(bid)}
+                        style={{
+                          padding: '12px 8px',
+                          background: isBidLegal(bid) ? 'rgba(74, 222, 128, 0.2)' : 'rgba(255, 255, 255, 0.02)',
+                          border: `2px solid ${isBidLegal(bid) ? 'rgba(74, 222, 128, 0.4)' : 'rgba(255, 255, 255, 0.05)'}`,
+                          borderRadius: '8px',
+                          color: isBidLegal(bid) ? '#4ade80' : 'rgba(255, 255, 255, 0.2)',
+                          fontSize: '16px',
+                          fontWeight: '600',
+                          cursor: isBidLegal(bid) ? 'pointer' : 'not-allowed',
+                          transition: 'all 0.2s',
+                          opacity: isBidLegal(bid) ? 1 : 0.3
+                        }}
+                        onMouseEnter={e => {
+                          if (isBidLegal(bid)) {
+                            e.target.style.transform = 'translateY(-2px)';
+                            e.target.style.boxShadow = '0 4px 12px rgba(74, 222, 128, 0.3)';
+                          }
+                        }}
+                        onMouseLeave={e => {
+                          e.target.style.transform = 'translateY(0)';
+                          e.target.style.boxShadow = 'none';
+                        }}
+                      >
+                        {formatBid(bid)}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          );
+        };
+
+        const HandDisplay = ({ hand }) => {
+          const suits = [
+            { symbol: '♠', name: 'S', color: '#000', bgColor: '#e2e8f0', holding: hand.S },
+            { symbol: '♥', name: 'H', color: '#dc2626', bgColor: '#fee2e2', holding: hand.H },
+            { symbol: '♦', name: 'D', color: '#ea580c', bgColor: '#fed7aa', holding: hand.D },
+            { symbol: '♣', name: 'C', color: '#166534', bgColor: '#dcfce7', holding: hand.C }
+          ];
+
+          return (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+              {suits.map(suit => (
+                <div key={suit.name} style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                  <div style={{
+                    width: '32px',
+                    height: '32px',
+                    borderRadius: '6px',
+                    background: suit.bgColor,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontSize: '20px',
+                    color: suit.color,
+                    fontWeight: '700',
+                    flexShrink: 0
+                  }}>
+                    {suit.symbol}
+                  </div>
+                  <div style={{
+                    fontSize: '18px',
+                    fontWeight: '600',
+                    letterSpacing: '0.08em',
+                    color: '#e8edf2'
+                  }}>
+                    {suit.holding}
+                  </div>
+                </div>
+              ))}
+            </div>
+          );
+        };
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
