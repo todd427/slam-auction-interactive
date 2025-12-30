@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>New to Bridge? - SLAM Auction</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'DM Sans', -apple-system, sans-serif;
+            background: linear-gradient(135deg, #0f1419 0%, #1a2332 100%);
+            color: #e8edf2;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+        
+        h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 56px;
+            margin-bottom: 16px;
+            background: linear-gradient(135deg, #4ade80 0%, #22d3ee 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .subtitle {
+            font-size: 20px;
+            color: #94a3b8;
+        }
+        
+        .nav-bar {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+            padding: 16px 24px;
+            margin-bottom: 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .nav-bar a {
+            color: #94a3b8;
+            text-decoration: none;
+            font-size: 14px;
+            transition: color 0.2s;
+        }
+        
+        .nav-bar a:hover {
+            color: #4ade80;
+        }
+        
+        .section {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 16px;
+            padding: 40px;
+            margin-bottom: 32px;
+        }
+        
+        h2 {
+            font-size: 32px;
+            margin-bottom: 24px;
+            color: #4ade80;
+        }
+        
+        h3 {
+            font-size: 24px;
+            margin: 32px 0 16px 0;
+            color: #22d3ee;
+        }
+        
+        p {
+            margin-bottom: 16px;
+            font-size: 16px;
+            color: #cbd5e1;
+        }
+        
+        .highlight-box {
+            background: rgba(74, 222, 128, 0.1);
+            border: 1px solid rgba(74, 222, 128, 0.3);
+            border-radius: 12px;
+            padding: 24px;
+            margin: 24px 0;
+        }
+        
+        .warning-box {
+            background: rgba(251, 146, 60, 0.1);
+            border: 1px solid rgba(251, 146, 60, 0.3);
+            border-radius: 12px;
+            padding: 24px;
+            margin: 24px 0;
+        }
+        
+        .info-box {
+            background: rgba(34, 211, 238, 0.1);
+            border: 1px solid rgba(34, 211, 238, 0.3);
+            border-radius: 12px;
+            padding: 24px;
+            margin: 24px 0;
+        }
+        
+        ul, ol {
+            margin-left: 24px;
+            margin-bottom: 16px;
+            color: #cbd5e1;
+        }
+        
+        li {
+            margin-bottom: 8px;
+        }
+        
+        .card-display {
+            display: inline-block;
+            padding: 6px 12px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 6px;
+            font-weight: 600;
+            margin: 0 4px;
+        }
+        
+        .spade { color: #e2e8f0; }
+        .heart { color: #f87171; }
+        .diamond { color: #fb923c; }
+        .club { color: #4ade80; }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 24px 0;
+        }
+        
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        th {
+            color: #4ade80;
+            font-weight: 600;
+        }
+        
+        .cta-button {
+            display: inline-block;
+            background: linear-gradient(135deg, #4ade80 0%, #22d3ee 100%);
+            color: #0f1419;
+            padding: 16px 32px;
+            border-radius: 12px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 18px;
+            transition: all 0.2s;
+            margin-top: 24px;
+        }
+        
+        .cta-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(74, 222, 128, 0.3);
+        }
+        
+        .diagram {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            margin: 24px 0;
+            text-align: center;
+        }
+        
+        .seat {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 16px;
+        }
+        
+        .seat-name {
+            font-weight: 700;
+            color: #4ade80;
+            margin-bottom: 8px;
+        }
+        
+        @media (max-width: 768px) {
+            h1 { font-size: 36px; }
+            .section { padding: 24px; }
+            .diagram { grid-template-columns: repeat(2, 1fr); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="nav-bar">
+            <a href="/">← Back to Home</a>
+            <a href="/single">Start Playing →</a>
+        </div>
+
+        <div class="header">
+            <h1>New to Bridge?</h1>
+            <p class="subtitle">Everything you need to know to get started</p>
+        </div>
+
+        <!-- What is Bridge -->
+        <div class="section">
+            <h2>🃏 What is Bridge?</h2>
+            <p>
+                <strong>Contract Bridge</strong> (or simply "Bridge") is a trick-taking card game played by <strong>four players</strong> in two partnerships. It's one of the most intellectually challenging and socially engaging card games in the world.
+            </p>
+            
+            <div class="highlight-box">
+                <strong>Bridge in 60 seconds:</strong>
+                <ol>
+                    <li>Four players, two teams (North-South vs East-West)</li>
+                    <li>Players bid to declare how many tricks they can win</li>
+                    <li>One team tries to make their contract, the other tries to stop them</li>
+                    <li>Points are scored based on success or failure</li>
+                </ol>
+            </div>
+
+            <h3>Why Play Bridge?</h3>
+            <ul>
+                <li><strong>Mental Challenge:</strong> Strategy, memory, and logic combined</li>
+                <li><strong>Social Game:</strong> Play with friends or meet new people</li>
+                <li><strong>Lifelong Learning:</strong> Always something new to discover</li>
+                <li><strong>Global Community:</strong> Played by millions worldwide</li>
+                <li><strong>Competitive & Casual:</strong> From kitchen tables to world championships</li>
+            </ul>
+        </div>
+
+        <!-- The Basics -->
+        <div class="section">
+            <h2>🎴 The Basics</h2>
+            
+            <h3>The Deck</h3>
+            <p>Bridge uses a standard 52-card deck with four suits:</p>
+            <ul>
+                <li><span class="spade card-display">♠ Spades</span> (Black)</li>
+                <li><span class="heart card-display">♥ Hearts</span> (Red)</li>
+                <li><span class="diamond card-display">♦ Diamonds</span> (Red)</li>
+                <li><span class="club card-display">♣ Clubs</span> (Black)</li>
+            </ul>
+            
+            <p>Each suit has 13 cards: A, K, Q, J, 10, 9, 8, 7, 6, 5, 4, 3, 2</p>
+
+            <h3>The Players</h3>
+            <p>Four players sit in a square:</p>
+            
+            <div class="diagram">
+                <div></div>
+                <div class="seat">
+                    <div class="seat-name">North</div>
+                    <div style="color: #94a3b8; font-size: 14px;">Partner of South</div>
+                </div>
+                <div></div>
+                <div></div>
+                <div class="seat">
+                    <div class="seat-name">West</div>
+                    <div style="color: #94a3b8; font-size: 14px;">Partner of East</div>
+                </div>
+                <div></div>
+                <div class="seat">
+                    <div class="seat-name">East</div>
+                    <div style="color: #94a3b8; font-size: 14px;">Partner of West</div>
+                </div>
+                <div></div>
+                <div></div>
+                <div class="seat">
+                    <div class="seat-name">South</div>
+                    <div style="color: #94a3b8; font-size: 14px;">Partner of North</div>
+                </div>
+                <div></div>
+            </div>
+
+            <div class="info-box">
+                <strong>💡 Key Point:</strong> North-South are partners against East-West. Partners sit across from each other and work together to win.
+            </div>
+
+            <h3>The Deal</h3>
+            <p>
+                Each player receives <strong>13 cards</strong>. Players can see only their own cards (not their partner's or opponents' cards).
+            </p>
+        </div>
+
+        <!-- High Card Points -->
+        <div class="section">
+            <h2>🔢 Counting Points (HCP)</h2>
+            
+            <p>
+                Before bidding, you count your <strong>High Card Points (HCP)</strong>. This tells you how strong your hand is:
+            </p>
+
+            <table>
+                <tr>
+                    <th>Card</th>
+                    <th>Points</th>
+                    <th>Why?</th>
+                </tr>
+                <tr>
+                    <td>Ace (A)</td>
+                    <td>4 points</td>
+                    <td>Highest card, always wins</td>
+                </tr>
+                <tr>
+                    <td>King (K)</td>
+                    <td>3 points</td>
+                    <td>Second highest</td>
+                </tr>
+                <tr>
+                    <td>Queen (Q)</td>
+                    <td>2 points</td>
+                    <td>Third highest</td>
+                </tr>
+                <tr>
+                    <td>Jack (J)</td>
+                    <td>1 point</td>
+                    <td>Fourth highest</td>
+                </tr>
+                <tr>
+                    <td>10, 9, 8... 2</td>
+                    <td>0 points</td>
+                    <td>Small cards</td>
+                </tr>
+            </table>
+
+            <div class="highlight-box">
+                <strong>Example Hand:</strong><br>
+                <span class="spade">♠</span> A K 5 = 4 + 3 = 7 points<br>
+                <span class="heart">♥</span> Q J 4 = 2 + 1 = 3 points<br>
+                <span class="diamond">♦</span> 9 8 6 = 0 points<br>
+                <span class="club">♣</span> A 7 3 2 = 4 points<br>
+                <strong>Total: 14 HCP</strong>
+            </div>
+
+            <div class="info-box">
+                <strong>💡 Important:</strong> The deck has exactly 40 HCP total (4 Aces × 4 = 16, plus Kings, Queens, Jacks). Average hand = 10 HCP.
+            </div>
+        </div>
+
+        <!-- The Two Phases -->
+        <div class="section">
+            <h2>⚡ Two Phases of Bridge</h2>
+            
+            <p>Every hand of bridge has two distinct phases:</p>
+
+            <h3>Phase 1: The Auction (Bidding)</h3>
+            <p>
+                Players take turns <strong>bidding</strong> - stating how many tricks they think their partnership can win. The bidding determines:
+            </p>
+            <ul>
+                <li><strong>How many tricks</strong> the declaring side must win (7-13 tricks)</li>
+                <li><strong>What suit is trump</strong> (or if playing No Trump)</li>
+                <li><strong>Who is declarer</strong> (the person who plays the hand)</li>
+            </ul>
+
+            <div class="info-box">
+                <strong>🎯 This trainer focuses on Phase 1!</strong> We're teaching you the auction (bidding) because it's the foundation. Card play comes in Phase 2.
+            </div>
+
+            <h3>How Bidding Works</h3>
+            <p>Bids go in order: North → East → South → West → North... until three players Pass in a row.</p>
+            
+            <p>A bid consists of:</p>
+            <ol>
+                <li><strong>A level</strong> (1-7) = tricks above 6 you'll try to win</li>
+                <li><strong>A denomination</strong> (♣, ♦, ♥, ♠, or NT)</li>
+            </ol>
+
+            <div class="highlight-box">
+                <strong>Example Bids:</strong><br>
+                • <strong>"1♠"</strong> = "We'll win 7 tricks (6+1) with spades as trump"<br>
+                • <strong>"3NT"</strong> = "We'll win 9 tricks (6+3) with no trump suit"<br>
+                • <strong>"Pass"</strong> = "I don't want to bid right now"
+            </div>
+
+            <div class="warning-box">
+                <strong>⚠️ Bidding Rule:</strong> Each new bid must be higher than the last. You can't bid "1♠" after someone bid "2♣" - you'd need to bid "2♠" or higher.
+            </div>
+
+            <h3>Phase 2: The Play (Not in this trainer)</h3>
+            <p>
+                After bidding ends, the cards are played. One player (the declarer) tries to win the number of tricks they bid, while opponents try to stop them.
+            </p>
+            
+            <div class="info-box">
+                <strong>Coming Soon:</strong> Full card play, scoring, rubber bridge, and more! For now, we're focusing on mastering the auction.
+            </div>
+        </div>
+
+        <!-- Key Concepts -->
+        <div class="section">
+            <h2>🎯 Key Bidding Concepts</h2>
+
+            <h3>Trump vs. No Trump</h3>
+            <p>
+                <strong>Trump:</strong> One suit becomes "boss" - trump cards beat all other suits.<br>
+                <strong>No Trump (NT):</strong> No boss suit - highest card in the suit led wins.
+            </p>
+
+            <h3>Opening Requirements</h3>
+            <p>To open the bidding (make the first bid), you typically need:</p>
+            <ul>
+                <li><strong>13+ HCP</strong> for most opening bids</li>
+                <li><strong>15-17 HCP</strong> for 1NT opening</li>
+                <li><strong>6-11 HCP</strong> for weak two bids (2♥, 2♠) with a long suit</li>
+            </ul>
+
+            <h3>Responding to Partner</h3>
+            <p>When partner opens, you respond based on:</p>
+            <ul>
+                <li>Your HCP</li>
+                <li>Whether you have support (cards in partner's suit)</li>
+                <li>Your distribution (how cards are divided among suits)</li>
+            </ul>
+
+            <h3>Game and Slam</h3>
+            <table>
+                <tr>
+                    <th>Contract</th>
+                    <th>Tricks Needed</th>
+                    <th>HCP Needed</th>
+                </tr>
+                <tr>
+                    <td><strong>Part Score</strong></td>
+                    <td>7-8 tricks</td>
+                    <td>Less than 25 combined</td>
+                </tr>
+                <tr>
+                    <td><strong>Game</strong></td>
+                    <td>9-11 tricks</td>
+                    <td>25-26 combined HCP</td>
+                </tr>
+                <tr>
+                    <td><strong>Small Slam</strong></td>
+                    <td>12 tricks</td>
+                    <td>33+ combined HCP</td>
+                </tr>
+                <tr>
+                    <td><strong>Grand Slam</strong></td>
+                    <td>13 tricks (all!)</td>
+                    <td>37+ combined HCP</td>
+                </tr>
+            </table>
+        </div>
+
+        <!-- Common Conventions -->
+        <div class="section">
+            <h2>🔧 Basic Conventions You'll Learn</h2>
+            
+            <p>
+                Bridge has many <strong>conventions</strong> - artificial bids with special meanings that partners agree on. Here are some you'll practice:
+            </p>
+
+            <h3>Stayman</h3>
+            <p>
+                After partner opens 1NT, bid 2♣ to ask "Do you have a 4-card major?"
+            </p>
+
+            <h3>Jacoby Transfer</h3>
+            <p>
+                After partner opens 1NT, bid 2♦ to show 5+ hearts, or 2♥ to show 5+ spades.
+            </p>
+
+            <h3>Takeout Double</h3>
+            <p>
+                After opponent opens, double to show opening strength and support for unbid suits.
+            </p>
+
+            <div class="info-box">
+                <strong>Don't worry!</strong> Our trainer will teach you these step-by-step with practice hands and explanations.
+            </div>
+        </div>
+
+        <!-- Ready to Start -->
+        <div class="section">
+            <h2>🚀 Ready to Start?</h2>
+            
+            <p>
+                Now you understand the basics! Bridge has depth that takes years to master, but you can start playing and learning right away.
+            </p>
+
+            <div class="highlight-box">
+                <strong>What This Trainer Does:</strong><br>
+                • Teaches bidding conventions<br>
+                • Gives you real hands to practice<br>
+                • Provides instant feedback<br>
+                • Tracks your progress<br>
+                • Prepares you for real games
+            </div>
+
+            <div class="warning-box">
+                <strong>What's NOT Here Yet:</strong><br>
+                • Card play (coming soon!)<br>
+                • Scoring systems<br>
+                • Full games (rubber, duplicate)<br>
+                • Multiplayer
+            </div>
+
+            <p>
+                Start with <strong>Single Decision mode</strong> to learn conventions, then progress to <strong>Full Auction mode</strong> for realistic practice.
+            </p>
+
+            <div style="text-align: center; margin-top: 40px;">
+                <a href="/single" class="cta-button">Start Learning Bridge! →</a>
+            </div>
+        </div>
+
+        <!-- Resources -->
+        <div class="section">
+            <h2>📚 Want to Learn More?</h2>
+            
+            <p>Great resources for beginners:</p>
+            <ul>
+                <li><strong>Books:</strong> "Bridge For Dummies" by Eddie Kantar</li>
+                <li><strong>Online:</strong> American Contract Bridge League (ACBL) lessons</li>
+                <li><strong>Videos:</strong> Search "bridge basics" on YouTube</li>
+                <li><strong>Apps:</strong> Funbridge, Bridge Baron (for card play practice)</li>
+                <li><strong>Local:</strong> Find a bridge club near you for lessons</li>
+            </ul>
+
+            <div style="text-align: center; margin-top: 32px;">
+                <a href="/" style="color: #94a3b8; text-decoration: none;">← Back to Main Menu</a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

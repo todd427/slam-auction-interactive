@@ -556,6 +556,7 @@
           const [selectedBid, setSelectedBid] = useState(null);
           const [showFeedback, setShowFeedback] = useState(false);
           const [showHints, setShowHints] = useState(false); // Changed to false by default
+          const [showThinking, setShowThinking] = useState(false); // NEW: Show auction reasoning toggle
 
           const currentScenario = filteredScenarios[currentIndex];
 
@@ -648,7 +649,7 @@
                     ← Module Select
                   </button>
                 </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '24px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                   <button 
                     onClick={() => setShowHints(!showHints)}
                     style={{
@@ -664,6 +665,22 @@
                     }}
                   >
                     💡 {showHints ? 'Hints On' : 'Hints Off'}
+                  </button>
+                  <button 
+                    onClick={() => setShowThinking(!showThinking)}
+                    style={{
+                      background: showThinking ? 'rgba(251, 146, 60, 0.2)' : 'rgba(255, 255, 255, 0.05)',
+                      border: `1px solid ${showThinking ? 'rgba(251, 146, 60, 0.4)' : 'rgba(255, 255, 255, 0.1)'}`,
+                      borderRadius: '8px',
+                      padding: '8px 16px',
+                      color: showThinking ? '#fb923c' : '#94a3b8',
+                      fontSize: '14px',
+                      fontWeight: '600',
+                      cursor: 'pointer',
+                      transition: 'all 0.2s'
+                    }}
+                  >
+                    🧠 {showThinking ? 'Thinking On' : 'Thinking Off'}
                   </button>
                   <div style={{ fontSize: '18px', fontWeight: '600' }}>
                     Scenario {currentIndex + 1}/{filteredScenarios.length} • Score: {sessionScore}
@@ -735,7 +752,7 @@
                         <div style={{ fontSize: '20px', fontWeight: '700', minWidth: '60px' }}>
                           {bid.bid === '?' ? '?' : formatBid(bid.bid)}
                         </div>
-                        {bid.explanation && (
+                        {showThinking && bid.explanation && (
                           <div style={{ fontSize: '13px', color: '#94a3b8', fontStyle: 'italic' }}>
                             {bid.explanation}
                           </div>

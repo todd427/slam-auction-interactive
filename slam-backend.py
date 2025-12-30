@@ -25,6 +25,11 @@ def index():
     """Serve the main landing page with mode selection."""
     return send_file('index.html')
 
+@app.route('/bridge-101')
+def bridge_101():
+    """Serve the beginner's guide to bridge."""
+    return send_file('bridge-101.html')
+
 @app.route('/single')
 def single():
     """Serve the single-decision version."""
