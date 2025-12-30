@@ -36,7 +36,7 @@
         // Scenarios with ALL 4 hands for full auction
         const SCENARIOS = [
           {
-            id: "U01", module: "BASIC", title: "Stayman after 1NT",
+            id: "U01", module: "BASIC", title: "Responding to 1NT",
             dealer: "N", vul: "None", your_seat: "S",
             hands: {
               N: { S: "A105", H: "KQ84", D: "AQ6", C: "K73" },
@@ -51,7 +51,7 @@
             optimal_contract: "4H by N"
           },
           {
-            id: "U02", module: "BASIC", title: "Jacoby Transfer",
+            id: "U02", module: "BASIC", title: "Six-Card Major After 1NT",
             dealer: "N", vul: "None", your_seat: "S",
             hands: {
               N: { S: "A105", H: "KQ84", D: "AQ6", C: "K73" },
@@ -66,7 +66,7 @@
             optimal_contract: "2S by N"
           },
           {
-            id: "U03", module: "BASIC", title: "2/1 Game Force",
+            id: "U03", module: "BASIC", title: "Strong Hand After Major Opening",
             dealer: "N", vul: "None", your_seat: "S",
             hands: {
               N: { S: "AKJ84", H: "K6", D: "A84", C: "Q73" },
@@ -222,18 +222,37 @@
                 </div>
               ))}
             </div>
-            <button onClick={onHome} style={{
-              background: 'linear-gradient(135deg, #4ade80 0%, #22d3ee 100%)',
-              color: '#0f1419',
-              border: 'none',
-              borderRadius: '12px',
-              padding: '16px 32px',
-              fontSize: '18px',
-              fontWeight: '600',
-              cursor: 'pointer'
-            }}>
-              Back to Home
-            </button>
+            <div style={{ display: 'flex', gap: '16px', justifyContent: 'center' }}>
+              <a 
+                href="/"
+                style={{
+                  background: 'rgba(255, 255, 255, 0.05)',
+                  color: '#94a3b8',
+                  border: '1px solid rgba(255, 255, 255, 0.1)',
+                  borderRadius: '12px',
+                  padding: '16px 32px',
+                  fontSize: '16px',
+                  fontWeight: '600',
+                  cursor: 'pointer',
+                  textDecoration: 'none',
+                  display: 'inline-block'
+                }}
+              >
+                ⌂ Main Menu
+              </a>
+              <button onClick={onHome} style={{
+                background: 'linear-gradient(135deg, #4ade80 0%, #22d3ee 100%)',
+                color: '#0f1419',
+                border: 'none',
+                borderRadius: '12px',
+                padding: '16px 32px',
+                fontSize: '16px',
+                fontWeight: '600',
+                cursor: 'pointer'
+              }}>
+                Play Again
+              </button>
+            </div>
           </div>
         );
 
@@ -249,6 +268,7 @@
           const [thinking, setThinking] = useState(false);
           const [complete, setComplete] = useState(false);
           const [userFirstBid, setUserFirstBid] = useState(null);
+          const [showHints, setShowHints] = useState(false); // Changed to false by default
           
           const scen = scenarios[idx];
 
@@ -380,9 +400,37 @@ Make realistic bids that guide toward the optimal contract.`;
 
           return (
             <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
-              <div style={{ marginBottom: '32px', textAlign: 'center' }}>
-                <h2 style={{ fontSize: '28px', marginBottom: '8px' }}>{scen.title}</h2>
-                <div style={{ fontSize: '16px', color: '#94a3b8' }}>
+              <div style={{ marginBottom: '32px' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+                    <a href="/" style={{
+                      color: '#94a3b8',
+                      textDecoration: 'none',
+                      fontSize: '14px',
+                      cursor: 'pointer'
+                    }}>
+                      ⌂ Main Menu
+                    </a>
+                    <h2 style={{ fontSize: '28px', margin: 0 }}>{scen.title}</h2>
+                  </div>
+                  <button 
+                    onClick={() => setShowHints(!showHints)}
+                    style={{
+                      background: showHints ? 'rgba(34, 211, 238, 0.2)' : 'rgba(255, 255, 255, 0.05)',
+                      border: `1px solid ${showHints ? 'rgba(34, 211, 238, 0.4)' : 'rgba(255, 255, 255, 0.1)'}`,
+                      borderRadius: '8px',
+                      padding: '8px 16px',
+                      color: showHints ? '#22d3ee' : '#94a3b8',
+                      fontSize: '14px',
+                      fontWeight: '600',
+                      cursor: 'pointer',
+                      transition: 'all 0.2s'
+                    }}
+                  >
+                    💡 {showHints ? 'Hints On' : 'Hints Off'}
+                  </button>
+                </div>
+                <div style={{ fontSize: '16px', color: '#94a3b8', textAlign: 'center' }}>
                   Scenario {idx + 1}/{scenarios.length} • Score: {totalScore}
                 </div>
               </div>
@@ -397,16 +445,18 @@ Make realistic bids that guide toward the optimal contract.`;
                 }}>
                   <h3 style={{ marginBottom: '16px' }}>Your Hand ({scen.your_seat})</h3>
                   <HandDisplay hand={scen.hands[scen.your_seat]} />
-                  <div style={{
-                    marginTop: '20px',
-                    padding: '16px',
-                    background: 'rgba(34, 211, 238, 0.1)',
-                    borderRadius: '8px',
-                    fontSize: '14px',
-                    color: '#22d3ee'
-                  }}>
-                    💡 {scen.teaching_point}
-                  </div>
+                  {showHints && (
+                    <div style={{
+                      marginTop: '20px',
+                      padding: '16px',
+                      background: 'rgba(34, 211, 238, 0.1)',
+                      borderRadius: '8px',
+                      fontSize: '14px',
+                      color: '#22d3ee'
+                    }}>
+                      💡 {scen.teaching_point}
+                    </div>
+                  )}
                 </div>
 
                 {/* Auction */}

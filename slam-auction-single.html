@@ -39,7 +39,7 @@
         // All 15 scenarios with complete data
         const SCENARIOS = [
           {
-            id: "U01", module: "BASIC", title: "Stayman after 1NT",
+            id: "U01", module: "BASIC", title: "Responding to 1NT",
             dealer: "N", vul: "None", your_seat: "S",
             your_hand: { S: "KJ84", H: "A963", D: "K72", C: "85" },
             auction: [
@@ -52,7 +52,7 @@
             explanation: ["With 10 HCP and both majors, use Stayman to find a 4-4 fit."]
           },
           {
-            id: "U02", module: "BASIC", title: "Jacoby Transfer",
+            id: "U02", module: "BASIC", title: "Six-Card Major After 1NT",
             dealer: "N", vul: "None", your_seat: "S",
             your_hand: { S: "Q109764", H: "K5", D: "Q83", C: "72" },
             auction: [
@@ -65,7 +65,7 @@
             explanation: ["Bid 2♥ to transfer to spades, making partner declarer."]
           },
           {
-            id: "U03", module: "BASIC", title: "2/1 Game Force",
+            id: "U03", module: "BASIC", title: "Strong Hand After Major Opening",
             dealer: "N", vul: "None", your_seat: "S",
             your_hand: { S: "Q5", H: "A983", D: "KQ62", C: "AK2" },
             auction: [
@@ -78,7 +78,7 @@
             explanation: ["With 18 HCP, bid 2♦ to establish game force."]
           },
           {
-            id: "U04", module: "BASIC", title: "Weak Two Response",
+            id: "U04", module: "BASIC", title: "Strong Hand After Preempt",
             dealer: "N", vul: "None", your_seat: "S",
             your_hand: { S: "A874", H: "A96", D: "AK62", C: "AK" },
             auction: [
@@ -91,7 +91,7 @@
             explanation: ["With 20 HCP and 4 spades, bid game directly."]
           },
           {
-            id: "U05", module: "BASIC", title: "Limit Raise",
+            id: "U05", module: "BASIC", title: "Invitational Hand With Support",
             dealer: "S", vul: "None", your_seat: "N",
             your_hand: { S: "K84", H: "AJ63", D: "Q72", C: "K85" },
             auction: [
@@ -104,7 +104,7 @@
             explanation: ["Bid 3♠ to invite game with your 11 HCP."]
           },
           {
-            id: "C01", module: "COMPETE", title: "Negative Double",
+            id: "C01", module: "COMPETE", title: "Partner Opens, RHO Overcalls",
             dealer: "W", vul: "None", your_seat: "S",
             your_hand: { S: "J65", H: "A832", D: "KQ62", C: "A2" },
             auction: [
@@ -118,7 +118,7 @@
             explanation: ["Double shows 4+ hearts, the unbid major."]
           },
           {
-            id: "C02", module: "COMPETE", title: "Michaels Cue Bid",
+            id: "C02", module: "COMPETE", title: "5-5 in Two Suits",
             dealer: "E", vul: "E/W", your_seat: "S",
             your_hand: { S: "Q10765", H: "A10832", D: "6", C: "K2" },
             auction: [
@@ -130,7 +130,7 @@
             explanation: ["Cue 2♥ to show 5-5 in both majors."]
           },
           {
-            id: "C03", module: "COMPETE", title: "Unusual 2NT",
+            id: "C03", module: "COMPETE", title: "Two-Suited Over Major",
             dealer: "S", vul: "None", your_seat: "W",
             your_hand: { S: "7", H: "972", D: "KQ1053", C: "J10964" },
             auction: [
@@ -142,7 +142,7 @@
             explanation: ["Bid 2NT to show 5-5 in minors."]
           },
           {
-            id: "C04", module: "COMPETE", title: "Cue Bid Raise",
+            id: "C04", module: "COMPETE", title: "Supporting Partner's Overcall",
             dealer: "W", vul: "None", your_seat: "S",
             your_hand: { S: "Q1096", H: "K3", D: "AJ84", C: "A72" },
             auction: [
@@ -156,7 +156,7 @@
             explanation: ["Bid 2♥ to show game-forcing spade raise."]
           },
           {
-            id: "C05", module: "COMPETE", title: "Competitive Jump Raise",
+            id: "C05", module: "COMPETE", title: "Raising After Overcall",
             dealer: "N", vul: "N/S", your_seat: "S",
             your_hand: { S: "Q1065", H: "983", D: "AK62", C: "K2" },
             auction: [
@@ -169,7 +169,7 @@
             explanation: ["Bid 3♠ to show 10-12 HCP with 4 spades."]
           },
           {
-            id: "D01", module: "DEFENSE", title: "Takeout Double",
+            id: "D01", module: "DEFENSE", title: "Opening Strength After RHO Opens",
             dealer: "E", vul: "None", your_seat: "S",
             your_hand: { S: "AQ65", H: "KJ84", D: "6", C: "A732" },
             auction: [
@@ -181,7 +181,7 @@
             explanation: ["Double shows opening values with both majors."]
           },
           {
-            id: "D02", module: "DEFENSE", title: "1NT Overcall",
+            id: "D02", module: "DEFENSE", title: "Strong Balanced Over Opening",
             dealer: "W", vul: "None", your_seat: "S",
             your_hand: { S: "AQ6", H: "KJ8", D: "AK64", C: "A73" },
             auction: [
@@ -193,7 +193,7 @@
             explanation: ["Bid 1NT showing 15-18 HCP and spade stopper."]
           },
           {
-            id: "D03", module: "DEFENSE", title: "Weak Jump Overcall",
+            id: "D03", module: "DEFENSE", title: "Long Suit After RHO Opens",
             dealer: "N", vul: "E/W", your_seat: "E",
             your_hand: { S: "32", H: "KQJ10985", D: "J8", C: "94" },
             auction: [
@@ -205,7 +205,7 @@
             explanation: ["Jump to 3♥ to preempt with 7 hearts."]
           },
           {
-            id: "D04", module: "DEFENSE", title: "Responsive Double",
+            id: "D04", module: "DEFENSE", title: "After Partner Doubles",
             dealer: "W", vul: "None", your_seat: "S",
             your_hand: { S: "AQ65", H: "QJ84", D: "6", C: "A732" },
             auction: [
@@ -219,7 +219,7 @@
             explanation: ["Double to let partner choose the major."]
           },
           {
-            id: "D05", module: "DEFENSE", title: "Balancing",
+            id: "D05", module: "DEFENSE", title: "In Passout Seat",
             dealer: "E", vul: "None", your_seat: "S",
             your_hand: { S: "AQ65", H: "QJ8", D: "A64", C: "732" },
             auction: [
@@ -503,22 +503,43 @@
                 ))}
               </div>
 
-              <button
-                onClick={onNavigateHome}
-                style={{
-                  width: '100%',
-                  background: 'linear-gradient(135deg, #4ade80 0%, #22d3ee 100%)',
-                  color: '#0f1419',
-                  border: 'none',
-                  borderRadius: '12px',
-                  padding: '16px',
-                  fontSize: '18px',
-                  fontWeight: '600',
-                  cursor: 'pointer'
-                }}
-              >
-                Back to Home
-              </button>
+              <div style={{ display: 'flex', gap: '16px' }}>
+                <a 
+                  href="/"
+                  style={{
+                    flex: 1,
+                    background: 'rgba(255, 255, 255, 0.05)',
+                    color: '#94a3b8',
+                    border: '1px solid rgba(255, 255, 255, 0.1)',
+                    borderRadius: '12px',
+                    padding: '16px',
+                    fontSize: '16px',
+                    fontWeight: '600',
+                    cursor: 'pointer',
+                    textDecoration: 'none',
+                    textAlign: 'center',
+                    display: 'block'
+                  }}
+                >
+                  ⌂ Main Menu
+                </a>
+                <button
+                  onClick={onNavigateHome}
+                  style={{
+                    flex: 1,
+                    background: 'linear-gradient(135deg, #4ade80 0%, #22d3ee 100%)',
+                    color: '#0f1419',
+                    border: 'none',
+                    borderRadius: '12px',
+                    padding: '16px',
+                    fontSize: '16px',
+                    fontWeight: '600',
+                    cursor: 'pointer'
+                  }}
+                >
+                  Play Again
+                </button>
+              </div>
             </div>
           );
         };
@@ -534,6 +555,7 @@
           const [sessionScore, setSessionScore] = useState(0);
           const [selectedBid, setSelectedBid] = useState(null);
           const [showFeedback, setShowFeedback] = useState(false);
+          const [showHints, setShowHints] = useState(false); // Changed to false by default
 
           const currentScenario = filteredScenarios[currentIndex];
 
@@ -604,17 +626,48 @@
             <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
               {/* Header */}
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '32px' }}>
-                <button onClick={onNavigateHome} style={{
-                  background: 'none',
-                  border: 'none',
-                  color: '#94a3b8',
-                  cursor: 'pointer',
-                  fontSize: '14px'
-                }}>
-                  ← Back to Home
-                </button>
-                <div style={{ fontSize: '18px', fontWeight: '600' }}>
-                  Scenario {currentIndex + 1}/{filteredScenarios.length} • Score: {sessionScore}
+                <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
+                  <a href="/" style={{
+                    background: 'none',
+                    border: 'none',
+                    color: '#94a3b8',
+                    textDecoration: 'none',
+                    fontSize: '14px',
+                    cursor: 'pointer'
+                  }}>
+                    ⌂ Main Menu
+                  </a>
+                  <span style={{ color: '#475569' }}>|</span>
+                  <button onClick={onNavigateHome} style={{
+                    background: 'none',
+                    border: 'none',
+                    color: '#94a3b8',
+                    cursor: 'pointer',
+                    fontSize: '14px'
+                  }}>
+                    ← Module Select
+                  </button>
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '24px' }}>
+                  <button 
+                    onClick={() => setShowHints(!showHints)}
+                    style={{
+                      background: showHints ? 'rgba(34, 211, 238, 0.2)' : 'rgba(255, 255, 255, 0.05)',
+                      border: `1px solid ${showHints ? 'rgba(34, 211, 238, 0.4)' : 'rgba(255, 255, 255, 0.1)'}`,
+                      borderRadius: '8px',
+                      padding: '8px 16px',
+                      color: showHints ? '#22d3ee' : '#94a3b8',
+                      fontSize: '14px',
+                      fontWeight: '600',
+                      cursor: 'pointer',
+                      transition: 'all 0.2s'
+                    }}
+                  >
+                    💡 {showHints ? 'Hints On' : 'Hints Off'}
+                  </button>
+                  <div style={{ fontSize: '18px', fontWeight: '600' }}>
+                    Scenario {currentIndex + 1}/{filteredScenarios.length} • Score: {sessionScore}
+                  </div>
                 </div>
               </div>
 
@@ -641,17 +694,19 @@
                   </h3>
                   <HandDisplay hand={currentScenario.your_hand} />
                   
-                  <div style={{
-                    marginTop: '20px',
-                    padding: '16px',
-                    background: 'rgba(34, 211, 238, 0.1)',
-                    border: '1px solid rgba(34, 211, 238, 0.3)',
-                    borderRadius: '8px',
-                    fontSize: '14px',
-                    color: '#22d3ee'
-                  }}>
-                    💡 {currentScenario.teaching_point}
-                  </div>
+                  {showHints && (
+                    <div style={{
+                      marginTop: '20px',
+                      padding: '16px',
+                      background: 'rgba(34, 211, 238, 0.1)',
+                      border: '1px solid rgba(34, 211, 238, 0.3)',
+                      borderRadius: '8px',
+                      fontSize: '14px',
+                      color: '#22d3ee'
+                    }}>
+                      💡 {currentScenario.teaching_point}
+                    </div>
+                  )}
                 </div>
 
                 {/* Right: Auction */}
