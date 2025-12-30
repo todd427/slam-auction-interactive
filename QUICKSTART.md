@@ -11,12 +11,14 @@ export ANTHROPIC_API_KEY='your-key-here'
 
 ```bash
 python3 slam-backend.py
-# Then open slam-auction-interactive.html
 ```
+
+Then open your browser to: **http://localhost:5000**
 
 Or:
 ```bash
 ./start-slam.sh
+# Then go to http://localhost:5000
 ```
 
 ## 🎮 Controls

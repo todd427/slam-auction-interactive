@@ -62,9 +62,17 @@ chmod +x start-slam.sh
 
 ### Running the App
 
-1. Keep the backend running in a terminal
-2. Open `slam-auction-interactive.html` in your web browser
-3. Start bidding!
+1. Start the backend (keep it running):
+   ```bash
+   python3 slam-backend.py
+   ```
+
+2. **Open your browser and go to:**
+   ```
+   http://localhost:5000
+   ```
+
+That's it! The backend serves both the HTML and the API. 🎯
 
 ## 📁 Project Structure
 
