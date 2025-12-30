@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SLAM Auction - Bridge Bidding Trainer</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'DM Sans', -apple-system, sans-serif;
+            background: linear-gradient(135deg, #0f1419 0%, #1a2332 100%);
+            color: #e8edf2;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 20px;
+        }
+        
+        .container {
+            max-width: 1000px;
+            width: 100%;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+        
+        h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 72px;
+            margin-bottom: 16px;
+            background: linear-gradient(135deg, #4ade80 0%, #22d3ee 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .subtitle {
+            font-size: 24px;
+            color: #94a3b8;
+            margin-bottom: 8px;
+        }
+        
+        .tagline {
+            font-size: 16px;
+            color: #64748b;
+        }
+        
+        .modes {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 32px;
+            margin-bottom: 40px;
+        }
+        
+        .mode-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 40px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            color: inherit;
+            display: block;
+        }
+        
+        .mode-card:hover {
+            transform: translateY(-8px);
+            border-color: #4ade80;
+            box-shadow: 0 12px 40px rgba(74, 222, 128, 0.2);
+        }
+        
+        .mode-card.full:hover {
+            border-color: #22d3ee;
+            box-shadow: 0 12px 40px rgba(34, 211, 238, 0.2);
+        }
+        
+        .mode-icon {
+            font-size: 48px;
+            margin-bottom: 20px;
+        }
+        
+        .mode-title {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 12px;
+            color: #4ade80;
+        }
+        
+        .mode-card.full .mode-title {
+            color: #22d3ee;
+        }
+        
+        .mode-description {
+            font-size: 16px;
+            color: #cbd5e1;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+        
+        .mode-features {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .mode-features li {
+            font-size: 14px;
+            color: #94a3b8;
+            margin-bottom: 8px;
+            padding-left: 24px;
+            position: relative;
+        }
+        
+        .mode-features li:before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: #4ade80;
+            font-weight: 700;
+        }
+        
+        .mode-card.full .mode-features li:before {
+            color: #22d3ee;
+        }
+        
+        .mode-badge {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-top: 16px;
+        }
+        
+        .mode-card .mode-badge {
+            background: rgba(74, 222, 128, 0.2);
+            color: #4ade80;
+        }
+        
+        .mode-card.full .mode-badge {
+            background: rgba(34, 211, 238, 0.2);
+            color: #22d3ee;
+        }
+        
+        .info-section {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 16px;
+            padding: 32px;
+            margin-bottom: 32px;
+        }
+        
+        .info-section h3 {
+            font-size: 20px;
+            margin-bottom: 16px;
+            color: #e8edf2;
+        }
+        
+        .comparison {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+        
+        .comparison-item {
+            display: flex;
+            gap: 12px;
+            font-size: 14px;
+            color: #94a3b8;
+        }
+        
+        .comparison-label {
+            font-weight: 600;
+            min-width: 120px;
+            color: #cbd5e1;
+        }
+        
+        .footer {
+            text-align: center;
+            padding-top: 32px;
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        
+        .footer-links {
+            display: flex;
+            gap: 24px;
+            justify-content: center;
+            font-size: 14px;
+        }
+        
+        .footer-links a {
+            color: #94a3b8;
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+        
+        .footer-links a:hover {
+            color: #4ade80;
+        }
+        
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 48px;
+            }
+            
+            .modes {
+                grid-template-columns: 1fr;
+            }
+            
+            .comparison {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>SLAM Auction</h1>
+            <div class="subtitle">Bridge Bidding Trainer</div>
+            <div class="tagline">Choose your learning style</div>
+        </div>
+        
+        <div class="modes">
+            <a href="/single" class="mode-card">
+                <div class="mode-icon">🎯</div>
+                <div class="mode-title">Single Decision</div>
+                <div class="mode-description">
+                    Focus on one critical bid per scenario. Perfect for learning specific conventions quickly.
+                </div>
+                <ul class="mode-features">
+                    <li>One key decision per hand</li>
+                    <li>Immediate feedback</li>
+                    <li>15 scenarios</li>
+                    <li>~30 seconds each</li>
+                    <li>Great for beginners</li>
+                </ul>
+                <div class="mode-badge">QUICK PRACTICE</div>
+            </a>
+            
+            <a href="/full" class="mode-card full">
+                <div class="mode-icon">🎲</div>
+                <div class="mode-title">Full Auction</div>
+                <div class="mode-description">
+                    Experience complete auctions from start to finish. Bid multiple times as AI partners respond.
+                </div>
+                <ul class="mode-features">
+                    <li>Full multi-turn auctions</li>
+                    <li>Bid 2-4+ times per hand</li>
+                    <li>AI plays other 3 seats</li>
+                    <li>~2-3 minutes each</li>
+                    <li>Realistic practice</li>
+                </ul>
+                <div class="mode-badge">FULL EXPERIENCE</div>
+            </a>
+        </div>
+        
+        <div class="info-section">
+            <h3>Quick Comparison</h3>
+            <div class="comparison">
+                <div class="comparison-item">
+                    <span class="comparison-label">Time:</span>
+                    <span>Single: 30s | Full: 2-3min</span>
+                </div>
+                <div class="comparison-item">
+                    <span class="comparison-label">Bids per hand:</span>
+                    <span>Single: 1 | Full: 2-4+</span>
+                </div>
+                <div class="comparison-item">
+                    <span class="comparison-label">AI involvement:</span>
+                    <span>Single: None | Full: High</span>
+                </div>
+                <div class="comparison-item">
+                    <span class="comparison-label">Best for:</span>
+                    <span>Single: Learning | Full: Realism</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="info-section">
+            <h3>🎓 Our Recommendation</h3>
+            <div style="font-size: 14px; line-height: 1.8; color: #cbd5e1;">
+                <strong style="color: #4ade80;">New to bridge?</strong> Start with Single Decision mode to learn conventions first.<br>
+                <strong style="color: #22d3ee;">Intermediate+?</strong> Try Full Auction mode for realistic practice.<br>
+                <strong style="color: #fb923c;">Tournament prep?</strong> Alternate between both modes!
+            </div>
+        </div>
+        
+        <div class="footer">
+            <div class="footer-links">
+                <a href="https://github.com/yourusername/slam-auction" target="_blank">GitHub</a>
+                <a href="/docs" target="_blank">Documentation</a>
+                <a href="/about" target="_blank">About</a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

@@ -22,8 +22,18 @@ ANTHROPIC_API_KEY = os.environ.get('ANTHROPIC_API_KEY', '')
 
 @app.route('/')
 def index():
-    """Serve the main HTML file."""
-    return send_file('slam-auction-interactive.html')
+    """Serve the main landing page with mode selection."""
+    return send_file('index.html')
+
+@app.route('/single')
+def single():
+    """Serve the single-decision version."""
+    return send_file('slam-auction-single.html')
+
+@app.route('/full')
+def full():
+    """Serve the full multi-turn auction version."""
+    return send_file('slam-auction-full.html')
 
 @app.route('/api/bid', methods=['POST'])
 def get_bid():

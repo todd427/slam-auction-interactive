@@ -13,7 +13,11 @@ export ANTHROPIC_API_KEY='your-key-here'
 python3 slam-backend.py
 ```
 
-Then open your browser to: **http://localhost:5000**
+Then open: **http://localhost:5000**
+
+Choose your mode:
+- 🎯 Single Decision (quick practice)
+- 🎲 Full Auction (complete auctions)
 
 Or:
 ```bash

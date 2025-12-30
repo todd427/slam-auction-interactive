@@ -67,12 +67,16 @@ chmod +x start-slam.sh
    python3 slam-backend.py
    ```
 
-2. **Open your browser and go to:**
+2. **Open your browser:**
    ```
    http://localhost:5000
    ```
 
-That's it! The backend serves both the HTML and the API. 🎯
+3. **Choose your mode:**
+   - 🎯 **Single Decision** - Quick, focused practice (30s per scenario)
+   - 🎲 **Full Auction** - Complete realistic auctions (2-3min per scenario)
+
+The main page explains both modes and lets you choose! 🎯
 
 ## 📁 Project Structure
 
