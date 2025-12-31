@@ -480,16 +480,33 @@
               const prompt = `You are ${seat} playing bridge. You can see all hands (training mode).
 
 Hands: ${handsStr}
-Auction: ${auctionStr}
+Auction so far: ${auctionStr || 'None yet'}
 Teaching: ${scen.teaching_point}
 Optimal: ${scen.optimal_contract}
 
-What should ${seat} bid? Respond ONLY with JSON:
-{"bid": "Pass", "reasoning": "Brief"}
+What should ${seat} bid next? 
+
+CRITICAL BIDDING RULES:
+1. Your bid MUST be higher than the last bid (if any)
+2. Higher = greater level OR same level but higher suit
+3. Suit order: ♣ < ♦ < ♥ < ♠ < NT
+4. You can always Pass
+5. Example: After 2♠, you can bid 2NT, 3♣, 3♦, etc. but NOT 2♣, 2♦, 2♥
+
+Last bid in auction: ${auction.slice().reverse().find(b => b.bid !== 'Pass' && b.bid !== 'X')?.bid || 'None'}
+
+Respond ONLY with valid JSON:
+{"bid": "2C", "reasoning": "Brief explanation"}
+
+Bid format (use letters, not symbols):
+- Pass, X (for double)
+- 1C, 1D, 1H, 1S, 1NT
+- 2C, 2D, 2H, 2S, 2NT
+- etc. up to 7NT
 
 Make realistic bids that guide toward the optimal contract.`;
 
-              const res = await fetch("http://localhost:5000/api/bid", {
+              const res = await fetch("/api/bid", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ prompt })
@@ -500,6 +517,16 @@ Make realistic bids that guide toward the optimal contract.`;
               const text = data.content.find(c => c.type === 'text')?.text || '';
               const clean = text.replace(/```json|```/g, '').trim();
               const result = JSON.parse(clean);
+              
+              // Sanitize bid format (convert symbols to letters if needed)
+              if (result.bid && result.bid !== 'Pass' && result.bid !== 'X') {
+                result.bid = result.bid
+                  .replace(/♣/g, 'C')
+                  .replace(/♦/g, 'D')
+                  .replace(/♥/g, 'H')
+                  .replace(/♠/g, 'S')
+                  .toUpperCase();
+              }
               
               setThinking(false);
               return result;
@@ -549,7 +576,15 @@ Make realistic bids that guide toward the optimal contract.`;
           // Auto-bid for other players
           useEffect(() => {
             if (!complete && currentSeat !== scen.your_seat && !thinking && currentSeat) {
-              getClaudeBid(currentSeat).then(r => addBid(r.bid, r.reasoning));
+              getClaudeBid(currentSeat).then(result => {
+                // Validate AI bid is legal
+                if (result.bid !== 'Pass' && result.bid !== 'X' && !isBidLegal(result.bid)) {
+                  console.warn(`AI bid ${result.bid} is illegal, forcing Pass`);
+                  addBid('Pass', 'Forced pass (illegal bid)');
+                } else {
+                  addBid(result.bid, result.reasoning);
+                }
+              });
             }
           }, [currentSeat, complete]);
 
