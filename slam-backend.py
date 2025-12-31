@@ -42,7 +42,13 @@ def full():
 
 @app.route('/api/bid', methods=['POST'])
 def get_bid():
-    """Proxy endpoint for Claude API calls."""
+    """
+    Proxy endpoint for Claude API calls.
+    
+    Using Claude 3.5 Haiku - Most cost-effective model
+    Cost: $0.25/M input + $1.25/M output = ~$0.00075 per request
+    Monthly cost for MVP: ~$5-15/month (vs $60+ for Sonnet)
+    """
     if not ANTHROPIC_API_KEY:
         return jsonify({
             'error': 'ANTHROPIC_API_KEY not set. Set it as an environment variable.'
@@ -60,7 +66,7 @@ def get_bid():
                 'anthropic-version': '2023-06-01'
             },
             json={
-                'model': 'claude-sonnet-4-20250514',
+                'model': 'claude-3-5-haiku-20241022',  # Haiku - 12x cheaper than Sonnet!
                 'max_tokens': 300,
                 'messages': [
                     {'role': 'user', 'content': prompt}

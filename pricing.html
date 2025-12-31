@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pricing - SLAM Bridge</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'DM Sans', -apple-system, sans-serif;
+            background: linear-gradient(135deg, #0f1419 0%, #1a2332 100%);
+            color: #e8edf2;
+            padding: 40px 20px;
+        }
+        
+        .container { max-width: 1200px; margin: 0 auto; }
+        
+        h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 48px;
+            text-align: center;
+            margin-bottom: 16px;
+            background: linear-gradient(135deg, #4ade80 0%, #22d3ee 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .subtitle {
+            text-align: center;
+            font-size: 20px;
+            color: #94a3b8;
+            margin-bottom: 60px;
+        }
+        
+        .pricing-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 32px;
+            margin-bottom: 60px;
+        }
+        
+        .plan {
+            background: rgba(255, 255, 255, 0.03);
+            border: 2px solid rgba(255, 255, 255, 0.08);
+            border-radius: 24px;
+            padding: 40px;
+            position: relative;
+            transition: all 0.3s;
+        }
+        
+        .plan:hover {
+            transform: translateY(-8px);
+            border-color: rgba(74, 222, 128, 0.3);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+        
+        .plan.featured {
+            border-color: #4ade80;
+            box-shadow: 0 0 40px rgba(74, 222, 128, 0.2);
+        }
+        
+        .badge {
+            position: absolute;
+            top: -12px;
+            right: 24px;
+            background: linear-gradient(135deg, #4ade80 0%, #22d3ee 100%);
+            color: #0f1419;
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 700;
+        }
+        
+        .plan-name {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+        
+        .plan-price {
+            font-size: 48px;
+            font-weight: 700;
+            color: #4ade80;
+            margin-bottom: 8px;
+        }
+        
+        .plan-price span {
+            font-size: 20px;
+            color: #94a3b8;
+        }
+        
+        .plan-description {
+            color: #94a3b8;
+            margin-bottom: 32px;
+            min-height: 48px;
+        }
+        
+        .features {
+            list-style: none;
+            margin-bottom: 32px;
+        }
+        
+        .features li {
+            padding: 12px 0;
+            color: #cbd5e1;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .features li:before {
+            content: "✓";
+            color: #4ade80;
+            font-weight: 700;
+            font-size: 20px;
+        }
+        
+        .cta-button {
+            display: block;
+            width: 100%;
+            background: linear-gradient(135deg, #4ade80 0%, #22d3ee 100%);
+            color: #0f1419;
+            padding: 16px;
+            border-radius: 12px;
+            text-align: center;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 18px;
+            transition: all 0.2s;
+            border: none;
+            cursor: pointer;
+        }
+        
+        .cta-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(74, 222, 128, 0.3);
+        }
+        
+        .cta-button.secondary {
+            background: rgba(255, 255, 255, 0.05);
+            color: #e8edf2;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .faq {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .faq h2 {
+            font-size: 32px;
+            text-align: center;
+            margin-bottom: 40px;
+            color: #4ade80;
+        }
+        
+        .faq-item {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 16px;
+        }
+        
+        .faq-question {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            color: #22d3ee;
+        }
+        
+        .faq-answer {
+            color: #cbd5e1;
+            line-height: 1.6;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Simple, Transparent Pricing</h1>
+        <p class="subtitle">Start free. Upgrade when you're ready.</p>
+        
+        <div class="pricing-grid">
+            <!-- Free Plan -->
+            <div class="plan">
+                <div class="plan-name">Free</div>
+                <div class="plan-price">$0<span>/forever</span></div>
+                <p class="plan-description">Perfect for getting started with bridge bidding</p>
+                
+                <ul class="features">
+                    <li>All Single Decision scenarios (15)</li>
+                    <li>5 Full Auction plays per day</li>
+                    <li>Complete Bridge 101 guide</li>
+                    <li>Interactive tutorial</li>
+                    <li>Community support</li>
+                </ul>
+                
+                <a href="/signup" class="cta-button secondary">Start Free</a>
+            </div>
+            
+            <!-- Pro Plan -->
+            <div class="plan featured">
+                <div class="badge">MOST POPULAR</div>
+                <div class="plan-name">Pro</div>
+                <div class="plan-price">$7<span>/month</span></div>
+                <p class="plan-description">Everything you need to master bridge bidding</p>
+                
+                <ul class="features">
+                    <li><strong>Everything in Free, plus:</strong></li>
+                    <li>Unlimited Full Auction scenarios</li>
+                    <li>Advanced slam bidding scenarios</li>
+                    <li>Progress tracking & analytics</li>
+                    <li>Export session history</li>
+                    <li>Priority AI responses (faster)</li>
+                    <li>Custom scenario builder</li>
+                    <li>Ad-free experience</li>
+                </ul>
+                
+                <button onclick="upgradeToPro()" class="cta-button">Upgrade to Pro</button>
+            </div>
+            
+            <!-- Annual Plan -->
+            <div class="plan">
+                <div class="plan-name">Pro Annual</div>
+                <div class="plan-price">$60<span>/year</span></div>
+                <p class="plan-description">Save $24 with annual billing (2 months free!)</p>
+                
+                <ul class="features">
+                    <li><strong>Everything in Pro, plus:</strong></li>
+                    <li>Save 29% vs monthly</li>
+                    <li>Priority feature requests</li>
+                    <li>Early access to new scenarios</li>
+                    <li>Exclusive annual subscriber badge</li>
+                </ul>
+                
+                <button onclick="upgradeToAnnual()" class="cta-button">Get Annual</button>
+            </div>
+        </div>
+        
+        <!-- FAQ -->
+        <div class="faq">
+            <h2>Frequently Asked Questions</h2>
+            
+            <div class="faq-item">
+                <div class="faq-question">Can I try Pro before paying?</div>
+                <div class="faq-answer">
+                    Yes! Start with our generous free tier. You can play 5 Full Auction scenarios per day and all Single Decision scenarios. Upgrade when you're ready for more.
+                </div>
+            </div>
+            
+            <div class="faq-item">
+                <div class="faq-question">Can I cancel anytime?</div>
+                <div class="faq-answer">
+                    Absolutely. Cancel anytime from your account settings. You'll keep Pro access until the end of your billing period.
+                </div>
+            </div>
+            
+            <div class="faq-item">
+                <div class="faq-question">What payment methods do you accept?</div>
+                <div class="faq-answer">
+                    We accept all major credit cards (Visa, Mastercard, Amex) through our secure payment partner Stripe. We don't store your payment information.
+                </div>
+            </div>
+            
+            <div class="faq-item">
+                <div class="faq-question">Is there a family or team plan?</div>
+                <div class="faq-answer">
+                    Not yet, but we're working on it! If you're interested in a team plan for your bridge club, contact us at <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="ddb5b8b1b1b29daeb1bcb0bfafb4b9bab8f3b4b8">[email&#160;protected]</a>
+                </div>
+            </div>
+            
+            <div class="faq-item">
+                <div class="faq-question">Will prices increase?</div>
+                <div class="faq-answer">
+                    If you subscribe now, your price is locked in forever. Even if we raise prices later, you'll keep your original rate as long as you stay subscribed.
+                </div>
+            </div>
+            
+            <div class="faq-item">
+                <div class="faq-question">Do you offer refunds?</div>
+                <div class="faq-answer">
+                    Yes! If you're not satisfied within the first 30 days, we'll refund you in full, no questions asked.
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+        function upgradeToPro() {
+            // In production, this calls your Stripe integration
+            alert('Pro upgrade coming soon! Implementation in MONETIZATION-GUIDE.md');
+            // window.location.href = '/api/create-checkout-session?plan=pro';
+        }
+        
+        function upgradeToAnnual() {
+            // In production, this calls your S
