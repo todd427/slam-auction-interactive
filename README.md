@@ -6,6 +6,7 @@
 [![Flask](https://img.shields.io/badge/Flask-3.0-green.svg)](https://flask.palletsprojects.com/)
 [![Claude](https://img.shields.io/badge/Claude-Sonnet%204-orange.svg)](https://www.anthropic.com/)
 [![License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+![Tests](https://img.shields.io/badge/tests-25%20passed-brightgreen)
 
 ## 🎯 Features
 
