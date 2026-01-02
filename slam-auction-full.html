@@ -47,11 +47,12 @@
             opening_bid: "1NT",
             correct_first_bid: "2C",
             alternatives: [],
+            conventions: ["stayman"],
             teaching_point: "Use Stayman (2♣) to find 4-4 major fit",
             optimal_contract: "4H by N"
           },
           {
-            id: "U02", module: "BASIC", title: "Six-Card Major After 1NT",
+            id: "U02", module: "BASIC", title: "Partner Opens 1NT",
             dealer: "N", vul: "None", your_seat: "S",
             hands: {
               N: { S: "A105", H: "KQ84", D: "AQ6", C: "K73" },
@@ -62,11 +63,12 @@
             opening_bid: "1NT",
             correct_first_bid: "2H",
             alternatives: [],
+            conventions: ["transfers"],
             teaching_point: "Transfer to spades with 2♥",
             optimal_contract: "2S by N"
           },
           {
-            id: "U03", module: "BASIC", title: "Strong Hand After Major Opening",
+            id: "U03", module: "BASIC", title: "Partner Opens 1♠",
             dealer: "N", vul: "None", your_seat: "S",
             hands: {
               N: { S: "AKJ84", H: "K6", D: "A84", C: "Q73" },
@@ -77,11 +79,12 @@
             opening_bid: "1S",
             correct_first_bid: "2D",
             alternatives: [],
+            conventions: [],
             teaching_point: "Bid 2♦ to establish game force",
             optimal_contract: "6S by N"
           },
           {
-            id: "U04", module: "BASIC", title: "Strong Hand After Preempt",
+            id: "U04", module: "BASIC", title: "Partner Preempts 2♠",
             dealer: "N", vul: "None", your_seat: "S",
             hands: {
               N: { S: "KQ10865", H: "74", D: "J82", C: "93" },
@@ -126,7 +129,7 @@
             optimal_contract: "4S by N"
           },
           {
-            id: "C02", module: "COMPETE", title: "5-5 in Two Suits",
+            id: "C02", module: "COMPETE", title: "RHO Opens 1♥",
             dealer: "E", vul: "E/W", your_seat: "S",
             hands: {
               N: { S: "A2", H: "K64", D: "A10832", C: "Q73" },
@@ -141,7 +144,7 @@
             optimal_contract: "4S by S"
           },
           {
-            id: "C03", module: "COMPETE", title: "Two-Suited Over Major",
+            id: "C03", module: "COMPETE", title: "After They Open 1♥",
             dealer: "S", vul: "None", your_seat: "W",
             hands: {
               N: { S: "AQ64", H: "AK83", D: "A6", C: "K83" },
@@ -186,7 +189,7 @@
             optimal_contract: "4S by N"
           },
           {
-            id: "D01", module: "DEFENSE", title: "Opening Strength After RHO Opens",
+            id: "D01", module: "DEFENSE", title: "RHO Opens 1♣",
             dealer: "E", vul: "None", your_seat: "S",
             hands: {
               N: { S: "K1093", H: "Q73", D: "Q852", C: "K4" },
@@ -201,7 +204,7 @@
             optimal_contract: "2S by S"
           },
           {
-            id: "D02", module: "DEFENSE", title: "Strong Balanced Over Opening",
+            id: "D02", module: "DEFENSE", title: "After RHO Opens 1♦",
             dealer: "W", vul: "None", your_seat: "S",
             hands: {
               N: { S: "1084", H: "Q73", D: "9852", C: "K64" },
@@ -216,7 +219,7 @@
             optimal_contract: "3NT by S"
           },
           {
-            id: "D03", module: "DEFENSE", title: "Long Suit After RHO Opens",
+            id: "D03", module: "DEFENSE", title: "After RHO Opens 1♣",
             dealer: "N", vul: "E/W", your_seat: "E",
             hands: {
               N: { S: "AQ64", H: "A6", D: "AK1094", C: "K3" },
@@ -474,37 +477,108 @@
           const getClaudeBid = async (seat) => {
             setThinking(true);
             try {
-              const auctionStr = auction.map(b => `${b.seat}: ${b.bid}`).join(', ');
-              const handsStr = JSON.stringify(scen.hands, null, 2);
+              // Define partnerships
+              const partnerships = {
+                'N': { partner: 'S', opponents: ['E', 'W'] },
+                'E': { partner: 'W', opponents: ['N', 'S'] },
+                'S': { partner: 'N', opponents: ['E', 'W'] },
+                'W': { partner: 'E', opponents: ['N', 'S'] }
+              };
+              const partnership = partnerships[seat];
               
-              const prompt = `You are ${seat} playing bridge. You can see all hands (training mode).
+              // Format auction with partnership context
+              const formatAuctionWithContext = (auction) => {
+                return auction.map(b => {
+                  const isYou = b.seat === seat;
+                  const isPartner = b.seat === partnership.partner;
+                  const label = isYou ? '★ YOU' : 
+                               isPartner ? '★ YOUR PARTNER' : 
+                               '✗ OPPONENT';
+                  return `${b.seat} (${label}): ${b.bid}`;
+                }).join('\n');
+              };
+              
+              const auctionStr = auction.length > 0 ? formatAuctionWithContext(auction) : 'None yet';
+              
+              // Check if last bid was from partner or opponent
+              const lastBid = auction.length > 0 ? auction[auction.length - 1] : null;
+              const lastBidContext = lastBid ? 
+                (lastBid.seat === seat ? 'YOU' : 
+                 lastBid.seat === partnership.partner ? 'your PARTNER' : 
+                 'your OPPONENT') : 'Nobody';
+              
+              const calculateHCP = (hand) => {
+                const hcp = {'A': 4, 'K': 3, 'Q': 2, 'J': 1};
+                let total = 0;
+                Object.values(hand).forEach(suit => {
+                  for (let card of suit) {
+                    total += hcp[card] || 0;
+                  }
+                });
+                return total;
+              };
+              
+              // Convert "10" to "T" in suits for AI clarity (so it doesn't count as 2 cards)
+              const formatSuitForAI = (suit) => suit.replace(/10/g, 'T');
+              
+              const handHCP = calculateHCP(scen.hands[seat]);
+              
+              const prompt = `You are ${seat} playing bridge.
 
-Hands: ${handsStr}
-Auction so far: ${auctionStr || 'None yet'}
-Teaching: ${scen.teaching_point}
-Optimal: ${scen.optimal_contract}
+=== PARTNERSHIPS ===
+YOUR PARTNER IS: ${partnership.partner}
+YOU (${seat}) + ${partnership.partner} = PARTNERS working together
+YOUR OPPONENTS ARE: ${partnership.opponents[0]} and ${partnership.opponents[1]}
+${partnership.opponents[0]} + ${partnership.opponents[1]} = OPPONENTS trying to beat you
 
-What should ${seat} bid next? 
+Your hand (${seat}):
+Spades: ${formatSuitForAI(scen.hands[seat].S)} (${scen.hands[seat].S.length} cards)
+Hearts: ${formatSuitForAI(scen.hands[seat].H)} (${scen.hands[seat].H.length} cards)
+Diamonds: ${formatSuitForAI(scen.hands[seat].D)} (${scen.hands[seat].D.length} cards)
+Clubs: ${formatSuitForAI(scen.hands[seat].C)} (${scen.hands[seat].C.length} cards)
+Total HCP: ${handHCP}
 
-CRITICAL BIDDING RULES:
-1. Your bid MUST be higher than the last bid (if any)
-2. Higher = greater level OR same level but higher suit
-3. Suit order: ♣ < ♦ < ♥ < ♠ < NT
-4. You can always Pass
-5. Example: After 2♠, you can bid 2NT, 3♣, 3♦, etc. but NOT 2♣, 2♦, 2♥
+IMPORTANT: These are YOUR ONLY cards. You do not have any other cards. Do not claim to have cards you don't have.
+Note: "T" represents the 10 card (ten), not two separate cards.
 
-Last bid in auction: ${auction.slice().reverse().find(b => b.bid !== 'Pass' && b.bid !== 'X')?.bid || 'None'}
+The auction so far:
+${auctionStr}
 
-Respond ONLY with valid JSON:
-{"bid": "2C", "reasoning": "Brief explanation"}
+Last bid was from: ${lastBidContext} (${lastBid?.seat || 'N/A'} bid ${lastBid?.bid || 'N/A'})
 
-Bid format (use letters, not symbols):
-- Pass, X (for double)
-- 1C, 1D, 1H, 1S, 1NT
-- 2C, 2D, 2H, 2S, 2NT
-- etc. up to 7NT
+${lastBid?.bid === '2C' && lastBidContext.includes('OPPONENT') ? 
+`IMPORTANT: The 2♣ bid was from an OPPONENT, not your partner! 
+Do NOT respond to it as if it were Stayman from your partner.
+You should either pass, overcall naturally, or double - NOT respond with 2♦/2♥/2♠!` : ''}
 
-Make realistic bids that guide toward the optimal contract.`;
+What should you bid next?
+
+KEY RULES:
+${scen.conventions?.includes('stayman') ? `- STAYMAN CONVENTION (for the 1NT opener ONLY):
+  * If YOU opened 1NT and YOUR PARTNER bids 2♣: You MUST ALWAYS show your 4-card major or deny having one
+  * Look at YOUR OWN HAND:
+    - If you have 4+ HEARTS: bid 2♥ (example: with H:KQ84, bid 2♥)
+    - If you have 4+ SPADES: bid 2♠ (example: with S:AJ73, bid 2♠)
+    - If you have BOTH 4+ hearts AND 4+ spades: bid 2♥ first
+    - If you have NEITHER 4 hearts NOR 4 spades: bid 2♦ (denial)
+  * If opponent overcalls 3♣: bid 3♥ (with hearts) or 3♠ (with spades) or 3♦ (no major)
+  * Answer at the CHEAPEST level above opponent's bid
+  * CRITICAL: You MUST answer Stayman EVEN IF opponent doubles! The double does NOT cancel your obligation!
+  * DO NOT PASS just because opponent doubled - you MUST still show your major or bid 2♦!
+  * Passing is WRONG when partner bids Stayman - you MUST respond!
+  * If you are NOT the 1NT opener: Do not respond to opponent's 2♣ - that's between them and their partner!
+` : ''}${scen.conventions?.includes('transfers') ? `- JACOBY TRANSFERS (for the 1NT opener ONLY):
+  * If YOU opened 1NT and YOUR PARTNER bids 2♦: This is a TRANSFER to hearts - you MUST bid 2♥
+  * If YOU opened 1NT and YOUR PARTNER bids 2♥: This is a TRANSFER to spades - you MUST bid 2♠
+  * If you are NOT the 1NT opener: Do not respond to opponent's transfers - that's between them and their partner!
+` : ''}- When an OPPONENT bids anything: You may pass, overcall, or double
+- Your bid must be higher than the last bid (unless you Pass or Double)
+- Suit order: ♣ < ♦ < ♥ < ♠ < NT
+
+Respond with ONLY valid JSON:
+{"bid": "Pass", "reasoning": "Brief explanation"}
+
+Valid bid formats: Pass, X, 1C, 1D, 1H, 1S, 1NT, 2C, 2D, 2H, 2S, 2NT, ... up to 7NT`;
 
               const res = await fetch("/api/bid", {
                 method: "POST",
@@ -515,17 +589,43 @@ Make realistic bids that guide toward the optimal contract.`;
               if (!res.ok) throw new Error('API error');
               const data = await res.json();
               const text = data.content.find(c => c.type === 'text')?.text || '';
-              const clean = text.replace(/```json|```/g, '').trim();
+              
+              // Clean and extract JSON more robustly
+              let clean = text.trim();
+              clean = clean.replace(/```json\s*/g, '').replace(/```\s*/g, '');
+              
+              // Try to extract JSON object if embedded in other text
+              const jsonMatch = clean.match(/\{[^{}]*"bid"[^{}]*"reasoning"[^{}]*\}/);
+              if (jsonMatch) {
+                clean = jsonMatch[0];
+              }
+              
+              console.log('Attempting to parse:', clean.substring(0, 100));
               const result = JSON.parse(clean);
               
-              // Sanitize bid format (convert symbols to letters if needed)
-              if (result.bid && result.bid !== 'Pass' && result.bid !== 'X') {
-                result.bid = result.bid
-                  .replace(/♣/g, 'C')
-                  .replace(/♦/g, 'D')
-                  .replace(/♥/g, 'H')
-                  .replace(/♠/g, 'S')
-                  .toUpperCase();
+              // Sanitize bid format (convert symbols/words to standard format)
+              if (result.bid) {
+                // Handle double variations
+                if (result.bid.toUpperCase() === 'DOUBLE' || 
+                    result.bid.toUpperCase() === 'DBL' || 
+                    result.bid.toUpperCase() === 'D') {
+                  result.bid = 'X';
+                }
+                // Handle redouble variations  
+                else if (result.bid.toUpperCase() === 'REDOUBLE' || 
+                         result.bid.toUpperCase() === 'RDBL' || 
+                         result.bid.toUpperCase() === 'XX') {
+                  result.bid = 'XX';
+                }
+                // Convert suit symbols to letters
+                else if (result.bid !== 'Pass' && result.bid !== 'X' && result.bid !== 'XX') {
+                  result.bid = result.bid
+                    .replace(/♣/g, 'C')
+                    .replace(/♦/g, 'D')
+                    .replace(/♥/g, 'H')
+                    .replace(/♠/g, 'S')
+                    .toUpperCase();
+                }
               }
               
               setThinking(false);
@@ -577,9 +677,17 @@ Make realistic bids that guide toward the optimal contract.`;
           useEffect(() => {
             if (!complete && currentSeat !== scen.your_seat && !thinking && currentSeat) {
               getClaudeBid(currentSeat).then(result => {
+                // Log what AI returned
+                console.log(`AI (${currentSeat}) returned:`, JSON.stringify(result));
+                console.log(`Bid: "${result.bid}", Type: ${typeof result.bid}`);
+                
                 // Validate AI bid is legal
-                if (result.bid !== 'Pass' && result.bid !== 'X' && !isBidLegal(result.bid)) {
-                  console.warn(`AI bid ${result.bid} is illegal, forcing Pass`);
+                const isLegal = result.bid === 'Pass' || result.bid === 'X' || isBidLegal(result.bid);
+                console.log(`Is legal? ${isLegal}`);
+                
+                if (!isLegal) {
+                  console.warn(`AI bid ${result.bid} is ILLEGAL, forcing Pass`);
+                  console.log(`Last contract bid in auction:`, auction.slice().reverse().find(b => b.bid !== 'Pass' && b.bid !== 'X' && b.bid !== 'XX'));
                   addBid('Pass', 'Forced pass (illegal bid)');
                 } else {
                   addBid(result.bid, result.reasoning);
@@ -599,9 +707,12 @@ Make realistic bids that guide toward the optimal contract.`;
 
           // Check if bid is legal
           const isBidLegal = (bidValue) => {
-            if (bidValue === 'Pass' || bidValue === 'X') return true;
-            const lastBid = auction.slice().reverse().find(b => b.bid !== 'Pass' && b.bid !== 'X');
-            if (!lastBid) return true;
+            // Pass, double, redouble are always legal
+            if (bidValue === 'Pass' || bidValue === 'X' || bidValue === 'XX') return true;
+            
+            // Find last contract bid (ignore Pass/X/XX)
+            const lastBid = auction.slice().reverse().find(b => b.bid !== 'Pass' && b.bid !== 'X' && b.bid !== 'XX');
+            if (!lastBid) return true; // First bid is always legal
             
             const getBidValue = (b) => {
               const level = parseInt(b.charAt(0));
@@ -626,6 +737,15 @@ Make realistic bids that guide toward the optimal contract.`;
                       cursor: 'pointer'
                     }}>
                       ⌂ Main Menu
+                    </a>
+                    <span style={{ color: '#475569' }}>|</span>
+                    <a href="/conventions" style={{
+                      color: '#94a3b8',
+                      textDecoration: 'none',
+                      fontSize: '14px',
+                      cursor: 'pointer'
+                    }}>
+                      📖 Conventions
                     </a>
                     <h2 style={{ fontSize: '28px', margin: 0 }}>{scen.title}</h2>
                   </div>
@@ -751,7 +871,39 @@ Make realistic bids that guide toward the optimal contract.`;
                       }}>
                         <div style={{ fontSize: '12px', color: '#94a3b8' }}>FINAL CONTRACT</div>
                         <div style={{ fontSize: '24px', fontWeight: '700', color: '#4ade80' }}>
-                          {auction.slice().reverse().find(b => b.bid !== 'Pass')?.bid || 'Passed'} by {auction.slice().reverse().find(b => b.bid !== 'Pass')?.seat}
+                          {(() => {
+                            // Find last contract bid (not Pass/X/XX)
+                            const lastContract = auction.slice().reverse().find(b => b.bid !== 'Pass' && b.bid !== 'X' && b.bid !== 'XX');
+                            if (!lastContract) return 'Passed Out';
+                            
+                            // Determine declarer: first person in winning partnership to bid this strain
+                            const strain = lastContract.bid.substring(1); // Get suit (C/D/H/S/NT)
+                            const declarerSeat = lastContract.seat;
+                            
+                            // Get partner of declarer seat
+                            const partnerships = { 'N': 'S', 'S': 'N', 'E': 'W', 'W': 'E' };
+                            const partner = partnerships[declarerSeat];
+                            
+                            // Find first person in this partnership to bid this strain
+                            let actualDeclarer = declarerSeat;
+                            for (let i = 0; i < auction.length; i++) {
+                              const bid = auction[i];
+                              if (bid.bid !== 'Pass' && bid.bid !== 'X' && bid.bid !== 'XX') {
+                                const bidStrain = bid.bid.substring(1);
+                                if (bidStrain === strain && (bid.seat === declarerSeat || bid.seat === partner)) {
+                                  actualDeclarer = bid.seat;
+                                  break;
+                                }
+                              }
+                            }
+                            
+                            // Check for doubles/redoubles
+                            const hasDouble = auction.slice(auction.indexOf(lastContract)).some(b => b.bid === 'X');
+                            const hasRedouble = auction.slice(auction.indexOf(lastContract)).some(b => b.bid === 'XX');
+                            const modifier = hasRedouble ? ' Redoubled' : hasDouble ? ' Doubled' : '';
+                            
+                            return `${formatBid(lastContract.bid)}${modifier} by ${actualDeclarer}`;
+                          })()}
                         </div>
                         <div style={{ fontSize: '14px', color: '#cbd5e1', marginTop: '8px' }}>
                           Optimal: {scen.optimal_contract}
@@ -890,5 +1042,9 @@ Make realistic bids that guide toward the optimal contract.`;
         const root = ReactDOM.createRoot(document.getElementById('root'));
         root.render(<App />);
     </script>
-</body>
-</html>
+    
+    <!-- Footer -->
+    <footer style="position: fixed; bottom: 0; left: 0; right: 0; background: #1e293b; padding: 1rem; text-align: center; border-top: 1px solid #334155; z-index: 1000;">
+        <a href="https://github.com/todd427/slam-auction-interactive/issues/new" target="_blank" style="color: #94a3b8; text-decoration: none; margin: 0 1rem;">Report Bug 🐛</a>
+        <span style="color: #475569;">|</span>
+        <a href="/cdn-cgi/l/email-protection#e88e8d8d8c8a898b83a89b8489858a9a818c8f8dc6818d" style="color: #94a3b8; text-decoration: none; margin: 0 1rem;">Feedback

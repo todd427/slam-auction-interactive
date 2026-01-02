@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bridge Conventions Guide - SLAM Bridge</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            color: #e2e8f0;
+            line-height: 1.6;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: rgba(15, 23, 42, 0.8);
+            border-radius: 16px;
+            padding: 40px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        h1 {
+            font-size: 48px;
+            margin-bottom: 12px;
+            background: linear-gradient(135deg, #4ade80 0%, #22d3ee 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        h2 {
+            font-size: 32px;
+            margin: 40px 0 20px 0;
+            color: #4ade80;
+            border-bottom: 2px solid rgba(74, 222, 128, 0.3);
+            padding-bottom: 8px;
+        }
+        
+        h3 {
+            font-size: 24px;
+            margin: 24px 0 12px 0;
+            color: #22d3ee;
+        }
+        
+        p {
+            margin: 16px 0;
+            color: #cbd5e1;
+        }
+        
+        .section {
+            margin: 32px 0;
+            padding: 24px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .example {
+            background: rgba(34, 211, 238, 0.1);
+            border-left: 4px solid #22d3ee;
+            padding: 16px;
+            margin: 16px 0;
+            font-family: 'Courier New', monospace;
+            border-radius: 4px;
+        }
+        
+        .warning {
+            background: rgba(251, 146, 60, 0.1);
+            border-left: 4px solid #fb923c;
+            padding: 16px;
+            margin: 16px 0;
+            border-radius: 4px;
+        }
+        
+        .tip {
+            background: rgba(74, 222, 128, 0.1);
+            border-left: 4px solid #4ade80;
+            padding: 16px;
+            margin: 16px 0;
+            border-radius: 4px;
+        }
+        
+        ul, ol {
+            margin: 16px 0;
+            padding-left: 24px;
+            color: #cbd5e1;
+        }
+        
+        li {
+            margin: 8px 0;
+        }
+        
+        strong {
+            color: #4ade80;
+        }
+        
+        code {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            color: #22d3ee;
+        }
+        
+        a {
+            color: #22d3ee;
+            text-decoration: none;
+        }
+        
+        a:hover {
+            text-decoration: underline;
+        }
+        
+        .nav {
+            text-align: center;
+            margin: 32px 0;
+        }
+        
+        .nav a {
+            display: inline-block;
+            padding: 12px 24px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            margin: 0 8px;
+            transition: all 0.2s;
+        }
+        
+        .nav a:hover {
+            background: rgba(255, 255, 255, 0.1);
+            text-decoration: none;
+            transform: translateY(-2px);
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 16px 0;
+        }
+        
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        th {
+            background: rgba(74, 222, 128, 0.1);
+            color: #4ade80;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📖 Bridge Conventions Guide</h1>
+        <p style="font-size: 18px; color: #94a3b8; margin-bottom: 32px;">
+            Essential conventions every bridge player should know
+        </p>
+        
+        <div class="nav">
+            <a href="/">⌂ Main Menu</a>
+            <a href="/bridge-101">📚 Bridge 101</a>
+        </div>
+
+        <!-- Stayman -->
+        <div class="section">
+            <h2>Stayman Convention</h2>
+            
+            <p><strong>When:</strong> Partner opens 1NT</p>
+            <p><strong>You bid:</strong> 2♣</p>
+            <p><strong>Meaning:</strong> "Do you have a 4-card major (hearts or spades)?"</p>
+            
+            <h3>Partner's Responses:</h3>
+            <ul>
+                <li><strong>2♦</strong> = No 4-card major</li>
+                <li><strong>2♥</strong> = 4+ hearts (may also have 4 spades)</li>
+                <li><strong>2♠</strong> = 4 spades (no 4 hearts)</li>
+            </ul>
+            
+            <div class="example">
+<strong>Example:</strong>
+Partner: 1NT
+You: 2♣ (Stayman - asking about majors)
+Partner: 2♥ (showing 4 hearts)
+You: 4♥ (game in hearts)
+            </div>
+            
+            <div class="tip">
+                <strong>When to use:</strong> You have 4 cards in a major and game-going values (8+ HCP). Finding a 4-4 major fit is usually better than playing in notrump!
+            </div>
+        </div>
+
+        <!-- Jacoby Transfers -->
+        <div class="section">
+            <h2>Jacoby Transfers</h2>
+            
+            <p><strong>When:</strong> Partner opens 1NT</p>
+            <p><strong>You bid:</strong> 2♦ or 2♥</p>
+            <p><strong>Meaning:</strong> "Bid my 5+ card major, partner!"</p>
+            
+            <h3>How it works:</h3>
+            <ul>
+                <li><strong>2♦</strong> = Transfer to hearts (you have 5+ hearts)</li>
+                <li><strong>2♥</strong> = Transfer to spades (you have 5+ spades)</li>
+            </ul>
+            
+            <p>Partner MUST accept the transfer by bidding the next suit up.</p>
+            
+            <div class="example">
+<strong>Example:</strong>
+Partner: 1NT
+You: 2♥ (transfer - you have 6 spades)
+Partner: 2♠ (accepting transfer)
+You: Pass (or bid on with more strength)
+            </div>
+            
+            <h3>Why transfer?</h3>
+            <ol>
+                <li>Makes partner (the strong hand) the declarer</li>
+                <li>Protects partner's honors from opening lead</li>
+                <li>Allows you to show your hand type</li>
+            </ol>
+        </div>
+
+        <!-- Negative Double -->
+        <div class="section">
+            <h2>Negative Double</h2>
+            
+            <p><strong>When:</strong> Partner opens, RHO overcalls</p>
+            <p><strong>You bid:</strong> X (double)</p>
+            <p><strong>Meaning:</strong> "I have values and cards in unbid suits, especially unbid majors"</p>
+            
+            <div class="example">
+<strong>Example:</strong>
+Partner: 1♣
+RHO: 1♥ (overcall)
+You: X (negative double - showing spades and values)
+            </div>
+        </div>
+
+        <!-- Michaels -->
+        <div class="section">
+            <h2>Michaels Cue Bid</h2>
+            
+            <p><strong>When:</strong> Opponent opens a suit</p>
+            <p><strong>You bid:</strong> Same suit at 2-level</p>
+            <p><strong>Meaning:</strong> "I have 5-5 in two suits"</p>
+            
+            <h3>Which suits:</h3>
+            <table>
+                <tr>
+                    <th>Over</th>
+                    <th>You Bid</th>
+                    <th>Shows</th>
+                </tr>
+                <tr>
+                    <td>1♣</td>
+                    <td>2♣</td>
+                    <td>Both majors (5♥, 5♠)</td>
+                </tr>
+                <tr>
+                    <td>1♦</td>
+                    <td>2♦</td>
+                    <td>Both majors (5♥, 5♠)</td>
+                </tr>
+                <tr>
+                    <td>1♥</td>
+                    <td>2♥</td>
+                    <td>Spades + minor (5♠, 5♣ or 5♦)</td>
+                </tr>
+                <tr>
+                    <td>1♠</td>
+                    <td>2♠</td>
+                    <td>Hearts + minor (5♥, 5♣ or 5♦)</td>
+                </tr>
+            </table>
+        </div>
+
+        <!-- Unusual 2NT -->
+        <div class="section">
+            <h2>Unusual 2NT</h2>
+            
+            <p><strong>When:</strong> Opponent opens, you have two long minor suits</p>
+            <p><strong>You bid:</strong> 2NT</p>
+            <p><strong>Meaning:</strong> "I have 5-5 in both minors (clubs and diamonds)"</p>
+        </div>
+
+        <!-- Blackwood -->
+        <div class="section">
+            <h2>Blackwood (4NT)</h2>
+            
+            <p><strong>When:</strong> Considering slam</p>
+            <p><strong>You bid:</strong> 4NT</p>
+            <p><strong>Meaning:</strong> "How many aces do you have?"</p>
+            
+            <h3>Responses:</h3>
+            <ul>
+                <li><strong>5♣</strong> = 0 or 4 aces</li>
+                <li><strong>5♦</strong> = 1 ace</li>
+                <li><strong>5♥</strong> = 2 aces</li>
+                <li><strong>5♠</strong> = 3 aces</li>
+            </ul>
+        </div>
+
+        <!-- Important Distinction -->
+        <div class="section">
+            <h2>⚠️ Important Distinctions</h2>
+            
+            <h3>2♣ as Stayman vs Strong 2♣ Opening</h3>
+            
+            <p>These are COMPLETELY DIFFERENT:</p>
+            
+            <div class="tip">
+                <strong>1. Stayman (2♣ response to 1NT):</strong>
+                <ul>
+                    <li>Partner opened 1NT</li>
+                    <li>You bid 2♣</li>
+                    <li>This asks about majors</li>
+                    <li>Example: <code>Partner: 1NT, You: 2♣</code></li>
+                </ul>
+            </div>
+            
+            <div class="tip">
+                <strong>2. Strong 2♣ Opening:</strong>
+                <ul>
+                    <li>YOU open 2♣ (not after 1NT!)</li>
+                    <li>Shows 22+ HCP</li>
+                    <li>Game-forcing</li>
+                    <li>Example: <code>You: 2♣ (opening), Partner: 2♦ (waiting)</code></li>
+                </ul>
+            </div>
+            
+            <p><strong>Key difference:</strong> Stayman = Response to partner's 1NT. Strong 2♣ = Opening bid showing massive strength.</p>
+        </div>
+
+        <!-- When NOT to Use -->
+        <div class="section">
+            <h2>🚫 When NOT to Use Conventions</h2>
+            
+            <div class="warning">
+                <h3>Don't use Stayman/Transfers over OPPONENT's 1NT!</h3>
+                
+                <p>If opponent opens 1NT:</p>
+                <ul>
+                    <li><strong>You should:</strong> Overcall with a suit, double, or pass</li>
+                    <li><strong>You should NOT:</strong> Bid 2♣ "Stayman" - that's only for YOUR PARTNER's 1NT!</li>
+                </ul>
+                
+                <div class="example">
+<strong>WRONG:</strong>
+Opponent: 1NT
+You: 2♣ ❌ (This is NOT Stayman)
+
+<strong>CORRECT:</strong>
+Your Partner: 1NT
+Opponent: Pass
+You: 2♣ ✅ (This IS Stayman)
+                </div>
+            </div>
+            
+            <p style="font-size: 20px; margin-top: 24px;"><strong>Remember:</strong> Conventions are agreements with YOUR PARTNER, not tools to use against opponents!</p>
+        </div>
+
+        <!-- Quick Quiz -->
+        <div class="section">
+            <h2>🎯 Quick Quiz</h2>
+            
+            <div class="tip">
+                <strong>Q: Partner opens 1NT. You have ♠KJ84 ♥A963 ♦K72 ♣85. What do you bid?</strong>
+                <p style="margin-top: 12px;"><strong>A:</strong> <code>2♣</code> (Stayman) - You have 4-4 in the majors and 11 HCP. Ask partner if they have a 4-card major to find your 4-4 fit!</p>
+            </div>
+            
+            <div class="warning">
+                <strong>Q: Opponent opens 1NT. What do you bid with the same hand?</strong>
+                <p style="margin-top: 12px;"><strong>A:</strong> <code>Pass</code> - Don't use Stayman over opponent's 1NT! You don't have enough to compete.</p>
+            </div>
+        </div>
+
+        <!-- Resources -->
+        <div class="section">
+            <h2>📚 Learning Resources</h2>
+            
+            <p>For more on conventions:</p>
+            <ul>
+                <li><strong>ACBL:</strong> <a href="https://acbl.org/learn" target="_blank">acbl.org/learn</a></li>
+                <li><strong>Bridge Guys:</strong> YouTube channel with convention explanations</li>
+                <li><strong>Books:</strong> "25 Bridge Conventions You Should Know" by Barbara Seagram</li>
+                <li><strong>Practice:</strong> Use this app's scenarios to reinforce conventions!</li>
+            </ul>
+        </div>
+
+        <div class="nav">
+            <a href="/">⌂ Main Menu</a>
+            <a href="/single">🎯 Practice Single Decisions</a>
+            <a href="/full">🎴 Practice Full Auctions</a>
+        </div>
+    </div>
+    
+    <!-- Footer -->
+    <footer style="position: fixed; bottom: 0; left: 0; right: 0; background: #1e293b; padding: 1rem; text-align: center; border-top: 1px solid #334155; z-index: 1000;">
+        <a href="https://github.com/todd427/slam-auction-interactive/issues/new" target="_blank" style="color: #94a3b8; text-decoration: none; margin: 0 1rem;">Report Bug 🐛</a>
+        <span style="color: #475569;">|</span>
+        <a href="/cdn-cgi/l/email-protection#9ff9fafafbfdfefcf4dfecf3fef2fdedf6fbf8fab1f6fa" style="color: #94a3b8; text-decoration: none; margin: 0 1rem;">Feed

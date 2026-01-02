@@ -58,7 +58,7 @@ def test_api_bid_without_key(client):
     """Test API returns error without API key"""
     import os
     
-    # Skip test if API key is set
+    # Skip test if API key is set (can't test "no key" scenario when key exists)
     if os.environ.get('ANTHROPIC_API_KEY'):
         pytest.skip('Cannot test no-key scenario when ANTHROPIC_API_KEY is set')
     

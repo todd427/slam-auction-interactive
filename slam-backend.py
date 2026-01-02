@@ -30,6 +30,11 @@ def bridge_101():
     """Serve the beginner's guide to bridge."""
     return send_file('bridge-101.html')
 
+@app.route('/conventions')
+def conventions():
+    """Serve the conventions guide."""
+    return send_file('conventions.html')
+
 @app.route('/single')
 def single():
     """Serve the single-decision version."""
@@ -45,14 +50,21 @@ def get_bid():
     """
     Proxy endpoint for Claude API calls.
     
-    Using Claude 3.5 Haiku - Most cost-effective model
-    Cost: $0.25/M input + $1.25/M output = ~$0.00075 per request
-    Monthly cost for MVP: ~$5-15/month (vs $60+ for Sonnet)
+    Set CLAUDE_MODEL env variable to choose:
+    - 'haiku' (default): claude-3-5-haiku-20241022 - $1.50/mo for 100 req/day
+    - 'sonnet': claude-sonnet-4-20250514 - $18/mo for 100 req/day
     """
     if not ANTHROPIC_API_KEY:
         return jsonify({
             'error': 'ANTHROPIC_API_KEY not set. Set it as an environment variable.'
         }), 500
+    
+    # Choose model based on environment variable
+    model_choice = os.environ.get('CLAUDE_MODEL', 'haiku').lower()
+    if model_choice == 'sonnet':
+        model = 'claude-sonnet-4-20250514'
+    else:
+        model = 'claude-3-5-haiku-20241022'
     
     try:
         data = request.json
@@ -66,7 +78,7 @@ def get_bid():
                 'anthropic-version': '2023-06-01'
             },
             json={
-                'model': 'claude-3-5-haiku-20241022',  # Haiku - 12x cheaper than Sonnet!
+                'model': model,
                 'max_tokens': 300,
                 'messages': [
                     {'role': 'user', 'content': prompt}

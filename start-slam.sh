@@ -27,6 +27,9 @@ pip install -q -r requirements.txt
 echo "✓ Dependencies installed"
 echo ""
 
+echo "Using Claude: " $CLAUDE_MODEL
+echo ""
+
 # Start the backend
 echo "🚀 Starting backend on http://localhost:5000"
 echo ""
@@ -38,4 +41,4 @@ echo ""
 echo "Press Ctrl+C to stop the backend"
 echo ""
 
-python3 slam-backend.py
+python3 main.py
