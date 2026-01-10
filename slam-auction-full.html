@@ -12,6 +12,42 @@
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { margin: 0; font-family: 'DM Sans', -apple-system, sans-serif; }
         #root { min-height: 100vh; }
+        
+        /* Mobile responsive container */
+        .main-container {
+          max-width: 1200px;
+          margin: 0 auto;
+          padding: 0 16px;
+        }
+        
+        @media (max-width: 768px) {
+          .main-container {
+            padding: 0 12px;
+          }
+          
+          /* Stack grid on mobile */
+          .two-column-grid {
+            display: flex !important;
+            flex-direction: column !important;
+            gap: 16px !important;
+          }
+          
+          /* Smaller header on mobile */
+          .header-row {
+            flex-direction: column !important;
+            align-items: flex-start !important;
+            gap: 12px !important;
+          }
+          
+          .header-title {
+            font-size: 20px !important;
+          }
+          
+          /* Bid buttons grid */
+          .bid-grid {
+            grid-template-columns: repeat(4, 1fr) !important;
+          }
+        }
     </style>
 </head>
 <body>
@@ -726,9 +762,9 @@ Valid bid formats: Pass, X, 1C, 1D, 1H, 1S, 1NT, 2C, 2D, 2H, 2S, 2NT, ... up to 
           const isYourTurn = currentSeat === scen.your_seat && !complete;
 
           return (
-            <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
+            <div className="main-container">
               <div style={{ marginBottom: '32px' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+                <div className="header-row" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
                     <a href="/" style={{
                       color: '#94a3b8',
@@ -747,7 +783,7 @@ Valid bid formats: Pass, X, 1C, 1D, 1H, 1S, 1NT, 2C, 2D, 2H, 2S, 2NT, ... up to 
                     }}>
                       📖 Conventions
                     </a>
-                    <h2 style={{ fontSize: '28px', margin: 0 }}>{scen.title}</h2>
+                    <h2 className="header-title" style={{ fontSize: '28px', margin: 0 }}>{scen.title}</h2>
                   </div>
                   <div style={{ display: 'flex', gap: '12px' }}>
                     <button 
@@ -789,7 +825,7 @@ Valid bid formats: Pass, X, 1C, 1D, 1H, 1S, 1NT, 2C, 2D, 2H, 2S, 2NT, ... up to 
                 </div>
               </div>
 
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px' }}>
+              <div className="two-column-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px' }}>
                 {/* Your Hand */}
                 <div style={{
                   background: 'rgba(255, 255, 255, 0.03)',
@@ -938,7 +974,7 @@ Valid bid formats: Pass, X, 1C, 1D, 1H, 1S, 1NT, 2C, 2D, 2H, 2S, 2NT, ... up to 
                   <h3 style={{ marginBottom: '20px', textAlign: 'center' }}>
                     Your Turn - What's your bid?
                   </h3>
-                  <div style={{
+                  <div className="bid-grid" style={{
                     display: 'grid',
                     gridTemplateColumns: 'repeat(auto-fill, minmax(70px, 1fr))',
                     gap: '8px'
@@ -1047,4 +1083,4 @@ Valid bid formats: Pass, X, 1C, 1D, 1H, 1S, 1NT, 2C, 2D, 2H, 2S, 2NT, ... up to 
     <footer style="position: fixed; bottom: 0; left: 0; right: 0; background: #1e293b; padding: 1rem; text-align: center; border-top: 1px solid #334155; z-index: 1000;">
         <a href="https://github.com/todd427/slam-auction-interactive/issues/new" target="_blank" style="color: #94a3b8; text-decoration: none; margin: 0 1rem;">Report Bug 🐛</a>
         <span style="color: #475569;">|</span>
-        <a href="/cdn-cgi/l/email-protection#e88e8d8d8c8a898b83a89b8489858a9a818c8f8dc6818d" style="color: #94a3b8; text-decoration: none; margin: 0 1rem;">Feedback
+        <a href="/cdn-cgi/l/email-protection#e88e8d8d8c8a898b83a89b8489858a9a818c8f8dc6818d" style="color: #94a3b8; text-decoration: none; margin: 0 1rem;">Feedb
