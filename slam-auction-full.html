@@ -58,6 +58,7 @@
         const formatBid = (bid) => {
           if (bid === 'Pass') return 'Pass';
           if (bid === 'X') return 'X';
+          if (bid === 'XX') return 'XX';
           const suits = { C: '♣', D: '♦', H: '♥', S: '♠' };
           const level = bid.charAt(0);
           const suit = bid.substring(1);
