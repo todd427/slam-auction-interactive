@@ -188,7 +188,7 @@
               S: { S: "952", H: "965", D: "QJ2", C: "Q742" },
               W: { S: "7", H: "72", D: "KQ10953", C: "J10964" }
             },
-            opening_bid: "1S",
+            opening_bid: "1H",
             correct_first_bid: "2NT",
             alternatives: [],
             teaching_point: "Unusual 2NT shows both minors",
@@ -225,7 +225,7 @@
             optimal_contract: "4S by N"
           },
           {
-            id: "D01", module: "DEFENSE", title: "RHO Opens 1♣",
+            id: "D01", module: "DEFENSE", title: "RHO Opens 1♦",
             dealer: "E", vul: "None", your_seat: "S",
             hands: {
               N: { S: "K1093", H: "Q73", D: "Q852", C: "K4" },
@@ -248,7 +248,7 @@
               S: { S: "AQ6", H: "KJ8", D: "AK64", C: "A73" },
               W: { S: "K3", H: "A964", D: "Q107", C: "J1092" }
             },
-            opening_bid: "1S",
+            opening_bid: "1D",
             correct_first_bid: "1NT",
             alternatives: [],
             teaching_point: "1NT overcall shows 15-18 with stopper",
@@ -263,7 +263,7 @@
               S: { S: "K1095", H: "32", D: "Q65", C: "AQ76" },
               W: { S: "J87", H: "74", D: "732", C: "J10852" }
             },
-            opening_bid: "1D",
+            opening_bid: "1C",
             correct_first_bid: "3H",
             alternatives: ["2H"],
             teaching_point: "Weak jump overcall shows long suit, preemptive",
@@ -330,6 +330,7 @@
         const App = () => {
           const [view, setView] = useState('home');
           const [module, setModule] = useState('ALL');
+          const [startScenario, setStartScenario] = useState(0); // NEW: Which scenario to start on
           const [results, setResults] = useState([]);
           const [score, setScore] = useState(0);
 
@@ -341,11 +342,18 @@
               padding: '40px 20px'
             }}>
               {view === 'home' && (
-                <HomeScreen onStart={(m) => { setModule(m); setView('play'); }} />
+                <HomeScreen 
+                  onStart={(m, scenarioIdx) => { 
+                    setModule(m); 
+                    setStartScenario(scenarioIdx); 
+                    setView('play'); 
+                  }} 
+                />
               )}
               {view === 'play' && (
                 <FullAuction 
                   module={module}
+                  startScenario={startScenario}
                   onComplete={(r, s) => { setResults(r); setScore(s); setView('summary'); }}
                   onHome={() => setView('home')}
                 />
@@ -357,7 +365,10 @@
           );
         };
 
-        const HomeScreen = ({ onStart }) => (
+        const HomeScreen = ({ onStart }) => {
+          const [selectedScenario, setSelectedScenario] = useState(0);
+          
+          return (
           <div style={{ maxWidth: '900px', margin: '0 auto', textAlign: 'center' }}>
             <h1 style={{
               fontFamily: "'Playfair Display', serif",
@@ -369,15 +380,62 @@
             }}>
               SLAM Auction
             </h1>
-            <p style={{ fontSize: '20px', color: '#94a3b8', marginBottom: '40px' }}>
+            <p style={{ fontSize: '20px', color: '#94a3b8', marginBottom: '24px' }}>
               Full Interactive - Bid Multiple Times Throughout Auction
             </p>
+            
+            {/* Scenario Selector */}
+            <div style={{ marginBottom: '32px' }}>
+              <label style={{ 
+                display: 'block', 
+                marginBottom: '12px', 
+                fontSize: '18px',
+                fontWeight: '600', 
+                color: '#e2e8f0' 
+              }}>
+                1. Choose where to start:
+              </label>
+              <select 
+                value={selectedScenario}
+                onChange={(e) => setSelectedScenario(parseInt(e.target.value))}
+                style={{
+                  background: 'rgba(255, 255, 255, 0.05)',
+                  border: '1px solid rgba(255, 255, 255, 0.2)',
+                  borderRadius: '8px',
+                  padding: '12px 16px',
+                  color: '#e2e8f0',
+                  fontSize: '16px',
+                  cursor: 'pointer',
+                  outline: 'none',
+                  minWidth: '300px'
+                }}
+              >
+                {SCENARIOS.map((s, i) => (
+                  <option key={s.id} value={i} style={{ background: '#1e293b', color: '#e2e8f0' }}>
+                    {i + 1}. {s.title}
+                  </option>
+                ))}
+              </select>
+            </div>
+            
+            <div style={{ marginBottom: '16px' }}>
+              <label style={{ 
+                display: 'block', 
+                fontSize: '18px',
+                fontWeight: '600', 
+                color: '#e2e8f0',
+                textAlign: 'center'
+              }}>
+                2. Select training mode:
+              </label>
+            </div>
+            
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
               {[
-                { id: 'ALL', name: 'All Scenarios', color: '#60a5fa' },
-                { id: 'BASIC', name: 'Basic Only', color: '#4ade80' }
+                { id: 'ALL', name: 'Start All Scenarios →', count: '(15 scenarios)', color: '#60a5fa' },
+                { id: 'BASIC', name: 'Start Basic Only →', count: '(5 scenarios)', color: '#4ade80' }
               ].map(m => (
-                <button key={m.id} onClick={() => onStart(m.id)} style={{
+                <button key={m.id} onClick={() => onStart(m.id, selectedScenario)} style={{
                   background: 'rgba(255, 255, 255, 0.03)',
                   border: `2px solid ${m.color}`,
                   borderRadius: '16px',
@@ -386,12 +444,17 @@
                   fontSize: '24px',
                   fontWeight: '700',
                   color: m.color,
-                  transition: 'all 0.2s'
+                  transition: 'all 0.2s',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  gap: '8px'
                 }}
                 onMouseEnter={e => e.target.style.transform = 'translateY(-4px)'}
                 onMouseLeave={e => e.target.style.transform = 'translateY(0)'}
                 >
-                  {m.name}
+                  <div>{m.name}</div>
+                  <div style={{ fontSize: '14px', fontWeight: '400', opacity: 0.7 }}>{m.count}</div>
                 </button>
               ))}
             </div>
@@ -410,7 +473,8 @@
               </div>
             </div>
           </div>
-        );
+          );
+        };
 
         const Summary = ({ results, score, onHome }) => (
           <div style={{ maxWidth: '800px', margin: '0 auto', textAlign: 'center' }}>
@@ -476,9 +540,9 @@
         );
 
         // FULL AUCTION COMPONENT - The main feature
-        const FullAuction = ({ module, onComplete, onHome }) => {
+        const FullAuction = ({ module, startScenario = 0, onComplete, onHome }) => {
           const scenarios = module === 'ALL' ? SCENARIOS : SCENARIOS.filter(s => s.module === module);
-          const [idx, setIdx] = useState(0);
+          const [idx, setIdx] = useState(startScenario);
           const [results, setResults] = useState([]);
           const [totalScore, setTotalScore] = useState(0);
           
@@ -490,18 +554,39 @@
           const [showHints, setShowHints] = useState(false); // Changed to false by default
           const [showThinking, setShowThinking] = useState(false); // NEW: Show AI reasoning toggle
           
+          // AbortController to cancel AI requests when scenario changes
+          const abortControllerRef = React.useRef(null);
+          
           const scen = scenarios[idx];
 
           // Initialize auction on scenario change
           useEffect(() => {
-            if (scen) {
-              const opening = { seat: scen.dealer, bid: scen.opening_bid, reasoning: 'Opening' };
-              setAuction([opening]);
-              setCurrentSeat(getNextSeat(scen.dealer));
+            // Cancel any in-flight AI requests from previous scenario
+            if (abortControllerRef.current) {
+              abortControllerRef.current.abort();
+              console.log('Aborted previous AI request');
+            }
+            
+            const currentScen = scenarios[idx];
+            if (currentScen) {
+              console.log(`Loading scenario ${idx + 1}: ${currentScen.title}, opening: ${currentScen.opening_bid}`);
+              
+              // Force complete reset
+              setThinking(false);
               setComplete(false);
               setUserFirstBid(null);
+              
+              // Set opening bid
+              const opening = { seat: currentScen.dealer, bid: currentScen.opening_bid, reasoning: 'Opening' };
+              setAuction([opening]);
+              
+              // Set next seat
+              const nextSeat = getNextSeat(currentScen.dealer);
+              setCurrentSeat(nextSeat);
+              
+              console.log(`Opening: ${currentScen.dealer} bids ${currentScen.opening_bid}, next: ${nextSeat}`);
             }
-          }, [idx, scen]);
+          }, [idx]);
 
           // Check if auction is complete (3 consecutive passes)
           const isAuctionComplete = (bids) => {
@@ -611,10 +696,15 @@ ${scen.conventions?.includes('stayman') ? `- STAYMAN CONVENTION (for the 1NT ope
 - Your bid must be higher than the last bid (unless you Pass or Double)
 - Suit order: ♣ < ♦ < ♥ < ♠ < NT
 
-Respond with ONLY valid JSON:
+CRITICAL: You MUST respond with ONLY valid JSON. Do NOT write any explanation or narrative.
+Your response MUST start with { and end with }
+
+REQUIRED FORMAT:
 {"bid": "Pass", "reasoning": "Brief explanation"}
 
-Valid bid formats: Pass, X, 1C, 1D, 1H, 1S, 1NT, 2C, 2D, 2H, 2S, 2NT, ... up to 7NT`;
+Valid bid formats: Pass, X, XX, 1C, 1D, 1H, 1S, 1NT, 2C, 2D, 2H, 2S, 2NT, ... up to 7NT
+
+REMEMBER: ONLY JSON! No other text!`;
 
               const res = await fetch("/api/bid", {
                 method: "POST",
@@ -669,7 +759,7 @@ Valid bid formats: Pass, X, 1C, 1D, 1H, 1S, 1NT, 2C, 2D, 2H, 2S, 2NT, ... up to 
             } catch (err) {
               console.error('Claude bid error:', err);
               setThinking(false);
-              return { bid: 'Pass', reasoning: 'Error' };
+              return { bid: 'Pass', reasoning: 'Network issue - defaulting to Pass' };
             }
           };
 
@@ -694,11 +784,17 @@ Valid bid formats: Pass, X, 1C, 1D, 1H, 1S, 1NT, 2C, 2D, 2H, 2S, 2NT, ... up to 
 
           // Score based on first bid
           const scoreScenario = () => {
-            if (!userFirstBid) return;
+            if (!userFirstBid) {
+              console.log('No userFirstBid, skipping scoring');
+              return;
+            }
             
             let points = 0;
             if (userFirstBid === scen.correct_first_bid) points = 3;
             else if (scen.alternatives.includes(userFirstBid)) points = 2;
+            
+            console.log(`Scoring scenario ${scen.id}: userFirstBid=${userFirstBid}, correct=${scen.correct_first_bid}, points=${points}`);
+            console.log(`Current totalScore: ${totalScore}, new totalScore: ${totalScore + points}`);
             
             setTotalScore(totalScore + points);
             setResults([...results, {
@@ -712,7 +808,18 @@ Valid bid formats: Pass, X, 1C, 1D, 1H, 1S, 1NT, 2C, 2D, 2H, 2S, 2NT, ... up to 
           // Auto-bid for other players
           useEffect(() => {
             if (!complete && currentSeat !== scen.your_seat && !thinking && currentSeat) {
+              const currentIdx = idx; // Capture current scenario index
+              
               getClaudeBid(currentSeat).then(result => {
+                // FIRST THING: Check if we're still on the same scenario
+                console.log(`AI returned: currentIdx=${currentIdx}, idx=${idx}, same=${currentIdx === idx}`);
+                if (currentIdx !== idx) {
+                  console.log(`🚫 Ignoring AI response from scenario ${currentIdx + 1}, now on ${idx + 1}`);
+                  setThinking(false); // Make sure to clear thinking state
+                  return;
+                }
+                console.log(`✅ Processing AI response for scenario ${idx + 1}`);
+                
                 // Log what AI returned
                 console.log(`AI (${currentSeat}) returned:`, JSON.stringify(result));
                 console.log(`Bid: "${result.bid}", Type: ${typeof result.bid}`);
@@ -728,9 +835,12 @@ Valid bid formats: Pass, X, 1C, 1D, 1H, 1S, 1NT, 2C, 2D, 2H, 2S, 2NT, ... up to 
                 } else {
                   addBid(result.bid, result.reasoning);
                 }
+              }).catch(err => {
+                console.error('AI bid error:', err);
+                setThinking(false);
               });
             }
-          }, [currentSeat, complete]);
+          }, [currentSeat, complete, idx]);
 
           // Next scenario
           const handleNext = () => {
