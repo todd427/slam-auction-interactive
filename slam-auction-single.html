@@ -85,9 +85,9 @@ KEY RULES:
         const getSystemFlag = (sys) => {
           if (sys === 'sayc') return '\u{1F1FA}\u{1F1F8}';
           const host = window.location.hostname;
-          if (host.includes('slambridge.ie')) return '\u{1F1EE}\u{1F1EA}';
-          if (host.includes('slambridge.nz')) return '\u{1F1F3}\u{1F1FF}';
-          return '\u{1F1EC}\u{1F1E7}';
+          if (host.includes('.nz')) return '\u{1F1F3}\u{1F1FF}';
+          if (host.includes('.uk') || host.includes('.co.uk')) return '\u{1F1EC}\u{1F1E7}';
+          return '\u{1F1EE}\u{1F1EA}';
         };
 
         // All 15 scenarios with complete data

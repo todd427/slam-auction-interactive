@@ -283,9 +283,9 @@
                 (function() {
                     var host = window.location.hostname;
                     var locale = navigator.language || '';
-                    var acolFlag = '\u{1F1EC}\u{1F1E7}';
-                    if (host.indexOf('slambridge.ie') >= 0) acolFlag = '\u{1F1EE}\u{1F1EA}';
-                    else if (host.indexOf('slambridge.nz') >= 0) acolFlag = '\u{1F1F3}\u{1F1FF}';
+                    var acolFlag = '\u{1F1EE}\u{1F1EA}';
+                    if (host.indexOf('.nz') >= 0) acolFlag = '\u{1F1F3}\u{1F1FF}';
+                    else if (host.indexOf('.uk') >= 0) acolFlag = '\u{1F1EC}\u{1F1E7}';
                     document.getElementById('acol-btn').textContent = acolFlag + ' ACOL (UK/Ireland)';
                     document.getElementById('sayc-btn').textContent = '\u{1F1FA}\u{1F1F8} Standard American (SAYC)';
                 })();
