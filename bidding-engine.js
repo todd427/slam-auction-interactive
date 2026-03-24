@@ -168,13 +168,18 @@
     const myOpening = ctx.myBids.length > 0 ? ctx.myBids[0] : null;
     if (!myOpening || myOpening.bid !== '1NT') return null;
 
+    // Respond at cheapest legal level
     if (eval_.lengths.H >= 4) {
-      return { bid: '2H', reasoning: 'Showing 4+ hearts in response to Stayman' };
+      const bid = lowestLegalBid('H', auction);
+      if (bid) return { bid, reasoning: 'Showing 4+ hearts in response to Stayman' };
     }
     if (eval_.lengths.S >= 4) {
-      return { bid: '2S', reasoning: 'Showing 4+ spades in response to Stayman' };
+      const bid = lowestLegalBid('S', auction);
+      if (bid) return { bid, reasoning: 'Showing 4+ spades in response to Stayman' };
     }
-    return { bid: '2D', reasoning: 'Denying a 4-card major (Stayman response)' };
+    const bid = lowestLegalBid('D', auction);
+    if (bid) return { bid, reasoning: 'Denying a 4-card major (Stayman response)' };
+    return { bid: 'Pass', reasoning: 'Cannot respond to Stayman at legal level' };
   }
 
   function handleTransferCompletion(hand, eval_, auction, ctx) {
@@ -229,8 +234,7 @@
     }
     // With 4-4 majors and enough points, bid Stayman
     if (eval_.lengths.H >= 4 && eval_.lengths.S >= 4 && eval_.hcp >= 8) {
-      const bid = lowestLegalBid('C', auction);
-      if (bid === '2C') return { bid: '2C', reasoning: 'Stayman — looking for 4-4 major fit' };
+      if (isLegalBid('2C', auction)) return { bid: '2C', reasoning: 'Stayman — looking for 4-4 major fit' };
     }
     // With 5+ major, transfer
     if (eval_.lengths.H >= 5 && isLegalBid('2D', auction)) {
@@ -239,9 +243,10 @@
     if (eval_.lengths.S >= 5 && isLegalBid('2H', auction)) {
       return { bid: '2H', reasoning: 'Transfer to spades (5+ spades)' };
     }
-    // Balanced with game values
+    // Balanced with game values — bid NT at lowest legal level
     if (eval_.hcp >= 10) {
-      return { bid: '3NT', reasoning: 'Balanced hand with game values' };
+      const bid = lowestLegalBid('NT', auction);
+      if (bid) return { bid, reasoning: 'Balanced hand with game values' };
     }
     return { bid: 'Pass', reasoning: 'No fit found, not enough for game' };
   }
@@ -620,7 +625,7 @@
       return { bid: 'Pass', reasoning: `Only ${eval_.hcp} HCP — too weak to act` };
     }
 
-    // 1. Convention responses (highest priority)
+    // 1. Convention responses (highest priority — always fire)
     let result;
 
     result = handleStaymanResponse(hand, eval_, auction, ctx);
@@ -636,6 +641,11 @@
     // 3. Responding to partner's takeout double
     result = respondToPartnerDouble(hand, eval_, auction, ctx);
     if (result) return result;
+
+    // If I've already bid 2+ times, pass (avoid infinite bidding loops)
+    if (ctx.myBids.length >= 2) {
+      return { bid: 'Pass', reasoning: 'Already bid twice — nothing more to add' };
+    }
 
     // 4. Competitive situations
     result = handleCompetitive(hand, eval_, auction, ctx, system);
