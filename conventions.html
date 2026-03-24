@@ -154,18 +154,122 @@
             color: #4ade80;
             font-weight: 600;
         }
+
+        .system-toggle {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 32px;
+        }
+        .system-btn {
+            padding: 8px 16px;
+            border-radius: 8px;
+            border: 1px solid rgba(255,255,255,0.15);
+            background: rgba(255,255,255,0.03);
+            color: #94a3b8;
+            font-size: 14px;
+            font-weight: 400;
+            cursor: pointer;
+            font-family: inherit;
+        }
+        .system-btn.active {
+            border-color: #4ade80;
+            background: rgba(74, 222, 128, 0.15);
+            color: #4ade80;
+            font-weight: 600;
+        }
+        .acol-only, .sayc-only { display: none; }
+        body.system-acol .acol-only { display: block; }
+        body.system-acol .sayc-only { display: none; }
+        body.system-sayc .sayc-only { display: block; }
+        body.system-sayc .acol-only { display: none; }
+        span.acol-only, span.sayc-only { display: none; }
+        body.system-acol span.acol-only { display: inline; }
+        body.system-sayc span.sayc-only { display: inline; }
+        li.acol-only, li.sayc-only { display: none; }
+        body.system-acol li.acol-only { display: list-item; }
+        body.system-sayc li.sayc-only { display: list-item; }
     </style>
 </head>
 <body>
+    <script>
+        (function() {
+            var sys = null;
+            if (localStorage.getItem('slam-bidding-system-manual')) {
+                var saved = localStorage.getItem('slam-bidding-system');
+                if (saved === 'acol' || saved === 'sayc') sys = saved;
+            }
+            if (!sys) {
+                var host = window.location.hostname;
+                if (host.indexOf('slambridge.ie') >= 0) sys = 'acol';
+                else if (host.indexOf('slambridge.us') >= 0) sys = 'sayc';
+                else {
+                    var locale = navigator.language || '';
+                    sys = ['en-GB','en-IE','en-NZ'].some(function(l){ return locale.indexOf(l) === 0; }) ? 'acol' : 'sayc';
+                }
+            }
+            document.body.className = 'system-' + sys;
+            window._bridgeSystem = sys;
+        })();
+        function setSystem(s) {
+            localStorage.setItem('slam-bidding-system', s);
+            localStorage.setItem('slam-bidding-system-manual', 'true');
+            document.body.className = 'system-' + s;
+            window._bridgeSystem = s;
+            document.querySelectorAll('.system-btn').forEach(function(btn) {
+                btn.classList.toggle('active', btn.dataset.system === s);
+            });
+        }
+    </script>
     <div class="container">
         <h1>📖 Bridge Conventions Guide</h1>
         <p style="font-size: 18px; color: #94a3b8; margin-bottom: 32px;">
             Essential conventions every bridge player should know
         </p>
-        
+
+        <div class="system-toggle">
+            <span style="color: #94a3b8; font-size: 14px;">Bidding system:</span>
+            <button class="system-btn" id="acol-btn" data-system="acol" onclick="setSystem('acol')">ACOL (UK/Ireland)</button>
+            <button class="system-btn" id="sayc-btn" data-system="sayc" onclick="setSystem('sayc')">Standard American (SAYC)</button>
+        </div>
+        <script>
+            (function() {
+                var host = window.location.hostname;
+                var acolFlag = '\u{1F1EE}\u{1F1EA}';
+                if (host.indexOf('.nz') >= 0) acolFlag = '\u{1F1F3}\u{1F1FF}';
+                else if (host.indexOf('.uk') >= 0) acolFlag = '\u{1F1EC}\u{1F1E7}';
+                document.getElementById('acol-btn').textContent = acolFlag + ' ACOL (UK/Ireland)';
+                document.getElementById('sayc-btn').textContent = '\u{1F1FA}\u{1F1F8} Standard American (SAYC)';
+                document.querySelectorAll('.system-btn').forEach(function(btn) {
+                    btn.classList.toggle('active', btn.dataset.system === window._bridgeSystem);
+                });
+            })();
+        </script>
+
         <div class="nav">
             <a href="/">⌂ Main Menu</a>
             <a href="/bridge-101">📚 Bridge 101</a>
+        </div>
+
+        <!-- ACOL key differences -->
+        <div class="section acol-only">
+            <h2>ACOL Key Differences</h2>
+
+            <p>ACOL differs from Standard American in several important ways:</p>
+
+            <table>
+                <tr><th>Rule</th><th>ACOL</th></tr>
+                <tr><td><strong>1NT opening</strong></td><td>12-14 HCP (weak no trump)</td></tr>
+                <tr><td><strong>Major openings</strong></td><td>1♥/1♠ promises only 4+ cards (not 5)</td></tr>
+                <tr><td><strong>Raising partner's major</strong></td><td>Need 4-card support (not 3)</td></tr>
+                <tr><td><strong>2NT opening</strong></td><td>20-22 HCP balanced</td></tr>
+                <tr><td><strong>Length points</strong></td><td>Not used when valuing your hand</td></tr>
+            </table>
+
+            <div class="tip">
+                <strong>Key implication:</strong> Because 1NT is weak (12-14), responder needs more points for game. With a strong hand (15-17), you open one of a suit instead.
+            </div>
         </div>
 
         <!-- Stayman -->
@@ -191,8 +295,11 @@ Partner: 2♥ (showing 4 hearts)
 You: 4♥ (game in hearts)
             </div>
             
-            <div class="tip">
-                <strong>When to use:</strong> You have 4 cards in a major and game-going values (8+ HCP). Finding a 4-4 major fit is usually better than playing in notrump!
+            <div class="tip sayc-only">
+                <strong>When to use:</strong> You have 4 cards in a major and game-going values (8+ HCP opposite partner's 15-17). Finding a 4-4 major fit is usually better than playing in notrump!
+            </div>
+            <div class="tip acol-only">
+                <strong>When to use:</strong> You have 4 cards in a major and game-going values (11+ HCP opposite partner's 12-14 weak NT). Finding a 4-4 major fit is usually better than playing in notrump!
             </div>
         </div>
 
@@ -326,13 +433,22 @@ You: X (negative double - showing spades and values)
                 </ul>
             </div>
             
-            <div class="tip">
+            <div class="tip sayc-only">
                 <strong>2. Strong 2♣ Opening:</strong>
                 <ul>
                     <li>YOU open 2♣ (not after 1NT!)</li>
                     <li>Shows 22+ HCP</li>
                     <li>Game-forcing</li>
                     <li>Example: <code>You: 2♣ (opening), Partner: 2♦ (waiting)</code></li>
+                </ul>
+            </div>
+            <div class="tip acol-only">
+                <strong>2. Strong 2♣ Opening:</strong>
+                <ul>
+                    <li>YOU open 2♣ (not after 1NT!)</li>
+                    <li>Shows 23+ HCP (or equivalent playing strength)</li>
+                    <li>Game-forcing</li>
+                    <li>Example: <code>You: 2♣ (opening), Partner: 2♦ (negative/waiting)</code></li>
                 </ul>
             </div>
             
@@ -387,10 +503,17 @@ You: 2♣ ✅ (This IS Stayman)
             <h2>📚 Learning Resources</h2>
             
             <p>For more on conventions:</p>
-            <ul>
+            <ul class="sayc-only">
                 <li><strong>ACBL:</strong> <a href="https://acbl.org/learn" target="_blank">acbl.org/learn</a></li>
                 <li><strong>Bridge Guys:</strong> YouTube channel with convention explanations</li>
                 <li><strong>Books:</strong> "25 Bridge Conventions You Should Know" by Barbara Seagram</li>
+                <li><strong>Practice:</strong> Use this app's scenarios to reinforce conventions!</li>
+            </ul>
+            <ul class="acol-only">
+                <li><strong>EBU:</strong> English Bridge Union — Bridge For All lessons</li>
+                <li><strong>CBAI:</strong> Contract Bridge Association of Ireland</li>
+                <li><strong>Books:</strong> "Really Easy Bidding" by the English Bridge Union</li>
+                <li><strong>Bridge Guys:</strong> YouTube channel with convention explanations</li>
                 <li><strong>Practice:</strong> Use this app's scenarios to reinforce conventions!</li>
             </ul>
         </div>
