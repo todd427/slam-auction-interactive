@@ -271,8 +271,18 @@
 
         <div class="system-toggle">
             <span style="color: #94a3b8; font-size: 14px;">Bidding system:</span>
-            <button class="system-btn" data-system="acol" onclick="setSystem('acol')">🇬🇧 ACOL (UK/Ireland)</button>
-            <button class="system-btn" data-system="sayc" onclick="setSystem('sayc')">🇺🇸 Standard American (SAYC)</button>
+            <button class="system-btn" id="acol-btn" data-system="acol" onclick="setSystem('acol')">ACOL (UK/Ireland)</button>
+            <button class="system-btn" id="sayc-btn" data-system="sayc" onclick="setSystem('sayc')">\u{1F1FA}\u{1F1F8} Standard American (SAYC)</button>
+            <script>
+                // Set locale-aware flag on ACOL button
+                (function() {
+                    var locale = navigator.language || '';
+                    var flag = '\u{1F1EC}\u{1F1E7}';
+                    if (locale.indexOf('en-IE') === 0) flag = '\u{1F1EE}\u{1F1EA}';
+                    else if (locale.indexOf('en-NZ') === 0) flag = '\u{1F1F3}\u{1F1FF}';
+                    document.getElementById('acol-btn').textContent = flag + ' ACOL (UK/Ireland)';
+                })();
+            </script>
         </div>
         <script>
             // Highlight active button on load

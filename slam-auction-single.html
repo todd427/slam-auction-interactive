@@ -40,7 +40,7 @@
           acol: {
             id: 'acol',
             name: 'ACOL',
-            label: '\u{1F1EC}\u{1F1E7} ACOL (UK/Ireland)',
+            label: 'ACOL (UK/Ireland)',
             nt1Range: [12, 14],
             majorCardMin: 4,
             nt2Range: [20, 22],
@@ -56,7 +56,7 @@ KEY RULES:
           sayc: {
             id: 'sayc',
             name: 'SAYC',
-            label: '\u{1F1FA}\u{1F1F8} Standard American (SAYC)',
+            label: 'Standard American (SAYC)',
             nt1Range: [15, 17],
             majorCardMin: 5,
             nt2Range: [20, 21],
@@ -77,6 +77,14 @@ KEY RULES:
           const locale = navigator.language || '';
           const acolLocales = ['en-GB', 'en-IE', 'en-NZ'];
           return acolLocales.some(l => locale.startsWith(l)) ? 'acol' : 'sayc';
+        };
+
+        const getSystemFlag = (sys) => {
+          if (sys === 'sayc') return '\u{1F1FA}\u{1F1F8}';
+          const locale = navigator.language || '';
+          if (locale.startsWith('en-IE')) return '\u{1F1EE}\u{1F1EA}';
+          if (locale.startsWith('en-NZ')) return '\u{1F1F3}\u{1F1FF}';
+          return '\u{1F1EC}\u{1F1E7}';
         };
 
         // All 15 scenarios with complete data
@@ -424,7 +432,7 @@ KEY RULES:
                       cursor: 'pointer',
                     }}
                   >
-                    {BIDDING_SYSTEMS[s].label}
+                    {getSystemFlag(s)} {BIDDING_SYSTEMS[s].label}
                   </button>
                 ))}
               </div>
