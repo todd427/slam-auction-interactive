@@ -31,6 +31,19 @@
           return suit === 'NT' ? `${level}NT` : `${level}${suits[suit]}`;
         };
 
+        const formatHolding = (holding) => {
+          const cards = [];
+          for (let i = 0; i < holding.length; i++) {
+            if (holding[i] === '1' && holding[i + 1] === '0') {
+              cards.push('10');
+              i++;
+            } else {
+              cards.push(holding[i]);
+            }
+          }
+          return cards.join(' ');
+        };
+
         const getNextSeat = (seat) => {
           const seats = ['N', 'E', 'S', 'W'];
           return seats[(seats.indexOf(seat) + 1) % 4];
@@ -920,10 +933,9 @@ KEY RULES:
                   <div style={{
                     fontSize: '18px',
                     fontWeight: '600',
-                    letterSpacing: '0.08em',
                     color: '#e8edf2'
                   }}>
-                    {suit.holding}
+                    {formatHolding(suit.holding)}
                   </div>
                 </div>
               ))}
