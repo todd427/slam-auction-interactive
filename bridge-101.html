@@ -201,9 +201,63 @@
             .section { padding: 24px; }
             .diagram { grid-template-columns: repeat(2, 1fr); }
         }
+        .system-toggle {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 40px;
+        }
+        .system-btn {
+            padding: 8px 16px;
+            border-radius: 8px;
+            border: 1px solid rgba(255,255,255,0.15);
+            background: rgba(255,255,255,0.03);
+            color: #94a3b8;
+            font-size: 14px;
+            font-weight: 400;
+            cursor: pointer;
+            font-family: inherit;
+        }
+        .system-btn.active {
+            border-color: #4ade80;
+            background: rgba(74, 222, 128, 0.15);
+            color: #4ade80;
+            font-weight: 600;
+        }
+        .acol-only, .sayc-only { display: none; }
+        body.system-acol .acol-only { display: block; }
+        body.system-acol .sayc-only { display: none; }
+        body.system-sayc .sayc-only { display: block; }
+        body.system-sayc .acol-only { display: none; }
+        /* inline variants */
+        span.acol-only, span.sayc-only { display: none; }
+        body.system-acol span.acol-only { display: inline; }
+        body.system-sayc span.sayc-only { display: inline; }
     </style>
 </head>
 <body>
+    <script>
+        // Detect system from localStorage or locale
+        (function() {
+            var saved = localStorage.getItem('slam-bidding-system');
+            var sys = saved;
+            if (sys !== 'acol' && sys !== 'sayc') {
+                var locale = navigator.language || '';
+                sys = ['en-GB','en-IE','en-NZ'].some(function(l){ return locale.indexOf(l) === 0; }) ? 'acol' : 'sayc';
+            }
+            document.body.className = 'system-' + sys;
+            window._bridgeSystem = sys;
+        })();
+        function setSystem(s) {
+            localStorage.setItem('slam-bidding-system', s);
+            document.body.className = 'system-' + s;
+            window._bridgeSystem = s;
+            document.querySelectorAll('.system-btn').forEach(function(btn) {
+                btn.classList.toggle('active', btn.dataset.system === s);
+            });
+        }
+    </script>
     <div class="container">
         <div class="nav-bar">
             <a href="/">← Back to Home</a>
@@ -214,6 +268,18 @@
             <h1>New to Bridge?</h1>
             <p class="subtitle">Everything you need to know to get started</p>
         </div>
+
+        <div class="system-toggle">
+            <span style="color: #94a3b8; font-size: 14px;">Bidding system:</span>
+            <button class="system-btn" data-system="acol" onclick="setSystem('acol')">🇬🇧 ACOL (UK/Ireland)</button>
+            <button class="system-btn" data-system="sayc" onclick="setSystem('sayc')">🇺🇸 Standard American (SAYC)</button>
+        </div>
+        <script>
+            // Highlight active button on load
+            document.querySelectorAll('.system-btn').forEach(function(btn) {
+                btn.classList.toggle('active', btn.dataset.system === window._bridgeSystem);
+            });
+        </script>
 
         <!-- What is Bridge -->
         <div class="section">
@@ -415,9 +481,14 @@
             <p>To open the bidding (make the first bid), you typically need:</p>
             <ul>
                 <li><strong>13+ HCP</strong> for most opening bids</li>
-                <li><strong>15-17 HCP</strong> for 1NT opening</li>
+                <li class="acol-only"><strong>12-14 HCP</strong> for 1NT opening (weak no trump)</li>
+                <li class="sayc-only"><strong>15-17 HCP</strong> for 1NT opening (strong no trump)</li>
                 <li><strong>6-11 HCP</strong> for weak two bids (2♥, 2♠) with a long suit</li>
             </ul>
+
+            <div class="acol-only info-box">
+                <strong>💡 ACOL Note:</strong> In ACOL, opening 1 of a major (1♥ or 1♠) only promises 4+ cards, not 5. This is a key difference from Standard American.
+            </div>
 
             <h3>Responding to Partner</h3>
             <p>When partner opens, you respond based on:</p>
@@ -524,10 +595,18 @@
             <h2>📚 Want to Learn More?</h2>
             
             <p>Great resources for beginners:</p>
-            <ul>
+            <ul class="sayc-only">
                 <li><strong>Books:</strong> "Bridge For Dummies" by Eddie Kantar</li>
                 <li><strong>Online:</strong> American Contract Bridge League (ACBL) lessons</li>
                 <li><strong>Videos:</strong> Search "bridge basics" on YouTube</li>
+                <li><strong>Apps:</strong> Funbridge, Bridge Baron (for card play practice)</li>
+                <li><strong>Local:</strong> Find a bridge club near you for lessons</li>
+            </ul>
+            <ul class="acol-only">
+                <li><strong>Books:</strong> "Really Easy Bidding" by the English Bridge Union</li>
+                <li><strong>Online:</strong> English Bridge Union (EBU) — Bridge For All lessons</li>
+                <li><strong>Ireland:</strong> Contract Bridge Association of Ireland (CBAI) lessons</li>
+                <li><strong>Videos:</strong> Search "ACOL bridge basics" on YouTube</li>
                 <li><strong>Apps:</strong> Funbridge, Bridge Baron (for card play practice)</li>
                 <li><strong>Local:</strong> Find a bridge club near you for lessons</li>
             </ul>
