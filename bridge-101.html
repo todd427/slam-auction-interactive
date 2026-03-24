@@ -286,8 +286,6 @@
                     var acolFlag = '\u{1F1EC}\u{1F1E7}';
                     if (host.indexOf('slambridge.ie') >= 0) acolFlag = '\u{1F1EE}\u{1F1EA}';
                     else if (host.indexOf('slambridge.nz') >= 0) acolFlag = '\u{1F1F3}\u{1F1FF}';
-                    else if (locale.indexOf('en-IE') === 0) acolFlag = '\u{1F1EE}\u{1F1EA}';
-                    else if (locale.indexOf('en-NZ') === 0) acolFlag = '\u{1F1F3}\u{1F1FF}';
                     document.getElementById('acol-btn').textContent = acolFlag + ' ACOL (UK/Ireland)';
                     document.getElementById('sayc-btn').textContent = '\u{1F1FA}\u{1F1F8} Standard American (SAYC)';
                 })();

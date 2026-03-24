@@ -109,8 +109,8 @@ KEY RULES:
           const saved = localStorage.getItem('slam-bidding-system');
           if (saved === 'acol' || saved === 'sayc') return saved;
           const host = window.location.hostname;
-          if (host.endsWith('slambridge.ie')) return 'acol';
-          if (host.endsWith('slambridge.us')) return 'sayc';
+          if (host.includes('slambridge.ie')) return 'acol';
+          if (host.includes('slambridge.us')) return 'sayc';
           // Fallback to locale for localhost / other domains
           const locale = navigator.language || '';
           const acolLocales = ['en-GB', 'en-IE', 'en-NZ'];
@@ -119,12 +119,10 @@ KEY RULES:
 
         const getSystemFlag = (sys) => {
           if (sys === 'sayc') return '\u{1F1FA}\u{1F1F8}';
+          // ACOL flag: match the domain we're on
           const host = window.location.hostname;
-          if (host.endsWith('slambridge.ie')) return '\u{1F1EE}\u{1F1EA}';
-          if (host.endsWith('slambridge.nz')) return '\u{1F1F3}\u{1F1FF}';
-          const locale = navigator.language || '';
-          if (locale.startsWith('en-IE')) return '\u{1F1EE}\u{1F1EA}';
-          if (locale.startsWith('en-NZ')) return '\u{1F1F3}\u{1F1FF}';
+          if (host.includes('slambridge.ie')) return '\u{1F1EE}\u{1F1EA}';
+          if (host.includes('slambridge.nz')) return '\u{1F1F3}\u{1F1FF}';
           return '\u{1F1EC}\u{1F1E7}';
         };
 
