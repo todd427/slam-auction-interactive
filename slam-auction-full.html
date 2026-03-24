@@ -670,6 +670,7 @@ KEY RULES:
               setThinking(false);
               setComplete(false);
               setUserFirstBid(null);
+              userFirstBidRef.current = null;
               
               // Set opening bid
               const opening = { seat: currentScen.dealer, bid: currentScen.opening_bid, reasoning: 'Opening' };
@@ -860,14 +861,17 @@ REMEMBER: ONLY JSON! No other text!`;
             }
           };
 
+          // Track user's first bid via ref (avoids stale closure issues)
+          const userFirstBidRef = React.useRef(null);
+
           // Add bid to auction
           const addBid = (bid, reasoning) => {
             const newAuction = [...auction, { seat: currentSeat, bid, reasoning }];
             setAuction(newAuction);
-            
+
             if (isAuctionComplete(newAuction)) {
               setComplete(true);
-              scoreScenario();
+              scoreScenario(userFirstBidRef.current);
             } else {
               setCurrentSeat(getNextSeat(currentSeat));
             }
@@ -875,13 +879,16 @@ REMEMBER: ONLY JSON! No other text!`;
 
           // User bids
           const handleUserBid = (bid) => {
-            if (!userFirstBid) setUserFirstBid(bid);
+            if (!userFirstBid) {
+              setUserFirstBid(bid);
+              userFirstBidRef.current = bid;
+            }
             addBid(bid, 'Your bid');
           };
 
           // Score based on first bid
-          const scoreScenario = () => {
-            if (!userFirstBid) {
+          const scoreScenario = (firstBid) => {
+            if (!firstBid) {
               console.log('No userFirstBid, skipping scoring');
               return;
             }
@@ -891,17 +898,16 @@ REMEMBER: ONLY JSON! No other text!`;
               : scen.correct_first_bid;
 
             let points = 0;
-            if (userFirstBid === correctBid) points = 3;
-            else if (scen.alternatives.includes(userFirstBid)) points = 2;
+            if (firstBid === correctBid) points = 3;
+            else if (scen.alternatives.includes(firstBid)) points = 2;
 
-            console.log(`Scoring scenario ${scen.id}: userFirstBid=${userFirstBid}, correct=${correctBid}, points=${points}`);
-            console.log(`Current totalScore: ${totalScore}, new totalScore: ${totalScore + points}`);
-            
-            setTotalScore(totalScore + points);
-            setResults([...results, {
+            console.log(`Scoring scenario ${scen.id}: userFirstBid=${firstBid}, correct=${correctBid}, points=${points}`);
+
+            setTotalScore(prev => prev + points);
+            setResults(prev => [...prev, {
               scenario: scen.id,
               title: scen.title,
-              bid: userFirstBid,
+              bid: firstBid,
               points
             }]);
           };
