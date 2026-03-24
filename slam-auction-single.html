@@ -72,8 +72,10 @@ KEY RULES:
         };
 
         const detectSystem = () => {
-          const saved = localStorage.getItem('slam-bidding-system');
-          if (saved === 'acol' || saved === 'sayc') return saved;
+          if (localStorage.getItem('slam-bidding-system-manual')) {
+            const saved = localStorage.getItem('slam-bidding-system');
+            if (saved === 'acol' || saved === 'sayc') return saved;
+          }
           const host = window.location.hostname;
           if (host.includes('slambridge.ie')) return 'acol';
           if (host.includes('slambridge.us')) return 'sayc';
@@ -343,6 +345,7 @@ KEY RULES:
           const handleSystemChange = (newSystem) => {
             setSystem(newSystem);
             localStorage.setItem('slam-bidding-system', newSystem);
+            localStorage.setItem('slam-bidding-system-manual', 'true');
           };
 
           const handleStartSession = (module) => {

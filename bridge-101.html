@@ -238,11 +238,14 @@
 </head>
 <body>
     <script>
-        // Detect system from localStorage, then domain, then locale
+        // Detect system: manual override > domain > locale
         (function() {
-            var saved = localStorage.getItem('slam-bidding-system');
-            var sys = saved;
-            if (sys !== 'acol' && sys !== 'sayc') {
+            var sys = null;
+            if (localStorage.getItem('slam-bidding-system-manual')) {
+                var saved = localStorage.getItem('slam-bidding-system');
+                if (saved === 'acol' || saved === 'sayc') sys = saved;
+            }
+            if (!sys) {
                 var host = window.location.hostname;
                 if (host.indexOf('slambridge.ie') >= 0) sys = 'acol';
                 else if (host.indexOf('slambridge.us') >= 0) sys = 'sayc';
@@ -256,6 +259,7 @@
         })();
         function setSystem(s) {
             localStorage.setItem('slam-bidding-system', s);
+            localStorage.setItem('slam-bidding-system-manual', 'true');
             document.body.className = 'system-' + s;
             window._bridgeSystem = s;
             document.querySelectorAll('.system-btn').forEach(function(btn) {
