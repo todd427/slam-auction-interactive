@@ -30,6 +30,11 @@ def bridge_101():
     """Serve the beginner's guide to bridge."""
     return send_file('bridge-101.html')
 
+@app.route('/bidding-engine.js')
+def bidding_engine():
+    """Serve the rule-based bidding engine."""
+    return send_file('bidding-engine.js', mimetype='application/javascript')
+
 @app.route('/conventions')
 def conventions():
     """Serve the conventions guide."""

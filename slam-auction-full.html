@@ -52,6 +52,7 @@
 </head>
 <body>
     <div id="root"></div>
+    <script src="/bidding-engine.js"></script>
     <script type="text/babel">
         const { useState, useEffect } = React;
 
@@ -703,175 +704,17 @@ KEY RULES:
             return bids.slice(-3).every(b => b.bid === 'Pass');
           };
 
-          // Get Claude to bid
+          // Get AI bid using rule-based engine (no API call needed)
           const getClaudeBid = async (seat) => {
             setThinking(true);
-            try {
-              // Define partnerships
-              const partnerships = {
-                'N': { partner: 'S', opponents: ['E', 'W'] },
-                'E': { partner: 'W', opponents: ['N', 'S'] },
-                'S': { partner: 'N', opponents: ['E', 'W'] },
-                'W': { partner: 'E', opponents: ['N', 'S'] }
-              };
-              const partnership = partnerships[seat];
-              
-              // Format auction with partnership context
-              const formatAuctionWithContext = (auction) => {
-                return auction.map(b => {
-                  const isYou = b.seat === seat;
-                  const isPartner = b.seat === partnership.partner;
-                  const label = isYou ? '★ YOU' : 
-                               isPartner ? '★ YOUR PARTNER' : 
-                               '✗ OPPONENT';
-                  return `${b.seat} (${label}): ${b.bid}`;
-                }).join('\n');
-              };
-              
-              const auctionStr = auction.length > 0 ? formatAuctionWithContext(auction) : 'None yet';
-              
-              // Check if last bid was from partner or opponent
-              const lastBid = auction.length > 0 ? auction[auction.length - 1] : null;
-              const lastBidContext = lastBid ? 
-                (lastBid.seat === seat ? 'YOU' : 
-                 lastBid.seat === partnership.partner ? 'your PARTNER' : 
-                 'your OPPONENT') : 'Nobody';
-              
-              const calculateHCP = (hand) => {
-                const hcp = {'A': 4, 'K': 3, 'Q': 2, 'J': 1};
-                let total = 0;
-                Object.values(hand).forEach(suit => {
-                  for (let card of suit) {
-                    total += hcp[card] || 0;
-                  }
-                });
-                return total;
-              };
-              
-              // Convert "10" to "T" in suits for AI clarity (so it doesn't count as 2 cards)
-              const formatSuitForAI = (suit) => suit.replace(/10/g, 'T');
-              
-              const handHCP = calculateHCP(scen.hands[seat]);
-              
-              const prompt = `${BIDDING_SYSTEMS[system].preamble}
+            // Small delay so the UI feels natural
+            await new Promise(r => setTimeout(r, 300 + Math.random() * 400));
 
-You are ${seat} playing bridge.
+            const result = getRuleBid(seat, scen.hands, auction, system, scen.conventions || []);
+            console.log(`Rule engine (${seat}):`, JSON.stringify(result));
 
-=== PARTNERSHIPS ===
-YOUR PARTNER IS: ${partnership.partner}
-YOU (${seat}) + ${partnership.partner} = PARTNERS working together
-YOUR OPPONENTS ARE: ${partnership.opponents[0]} and ${partnership.opponents[1]}
-${partnership.opponents[0]} + ${partnership.opponents[1]} = OPPONENTS trying to beat you
-
-Your hand (${seat}):
-Spades: ${formatSuitForAI(scen.hands[seat].S)} (${scen.hands[seat].S.length} cards)
-Hearts: ${formatSuitForAI(scen.hands[seat].H)} (${scen.hands[seat].H.length} cards)
-Diamonds: ${formatSuitForAI(scen.hands[seat].D)} (${scen.hands[seat].D.length} cards)
-Clubs: ${formatSuitForAI(scen.hands[seat].C)} (${scen.hands[seat].C.length} cards)
-Total HCP: ${handHCP}
-
-IMPORTANT: These are YOUR ONLY cards. You do not have any other cards. Do not claim to have cards you don't have.
-Note: "T" represents the 10 card (ten), not two separate cards.
-
-The auction so far:
-${auctionStr}
-
-Last bid was from: ${lastBidContext} (${lastBid?.seat || 'N/A'} bid ${lastBid?.bid || 'N/A'})
-
-${lastBid?.bid === '2C' && lastBidContext.includes('OPPONENT') ? 
-`IMPORTANT: The 2♣ bid was from an OPPONENT, not your partner! 
-Do NOT respond to it as if it were Stayman from your partner.
-You should either pass, overcall naturally, or double - NOT respond with 2♦/2♥/2♠!` : ''}
-
-What should you bid next?
-
-KEY RULES:
-${scen.conventions?.includes('stayman') ? `- STAYMAN CONVENTION (for the 1NT opener ONLY):
-  * If YOU opened 1NT and YOUR PARTNER bids 2♣: You MUST ALWAYS show your 4-card major or deny having one
-  * Look at YOUR OWN HAND:
-    - If you have 4+ HEARTS: bid 2♥ (example: with H:KQ84, bid 2♥)
-    - If you have 4+ SPADES: bid 2♠ (example: with S:AJ73, bid 2♠)
-    - If you have BOTH 4+ hearts AND 4+ spades: bid 2♥ first
-    - If you have NEITHER 4 hearts NOR 4 spades: bid 2♦ (denial)
-  * If opponent overcalls 3♣: bid 3♥ (with hearts) or 3♠ (with spades) or 3♦ (no major)
-  * Answer at the CHEAPEST level above opponent's bid
-  * CRITICAL: You MUST answer Stayman EVEN IF opponent doubles! The double does NOT cancel your obligation!
-  * DO NOT PASS just because opponent doubled - you MUST still show your major or bid 2♦!
-  * Passing is WRONG when partner bids Stayman - you MUST respond!
-  * If you are NOT the 1NT opener: Do not respond to opponent's 2♣ - that's between them and their partner!
-` : ''}${scen.conventions?.includes('transfers') ? `- JACOBY TRANSFERS (for the 1NT opener ONLY):
-  * If YOU opened 1NT and YOUR PARTNER bids 2♦: This is a TRANSFER to hearts - you MUST bid 2♥
-  * If YOU opened 1NT and YOUR PARTNER bids 2♥: This is a TRANSFER to spades - you MUST bid 2♠
-  * If you are NOT the 1NT opener: Do not respond to opponent's transfers - that's between them and their partner!
-` : ''}- When an OPPONENT bids anything: You may pass, overcall, or double
-- Your bid must be higher than the last bid (unless you Pass or Double)
-- Suit order: ♣ < ♦ < ♥ < ♠ < NT
-
-CRITICAL: You MUST respond with ONLY valid JSON. Do NOT write any explanation or narrative.
-Your response MUST start with { and end with }
-
-REQUIRED FORMAT:
-{"bid": "Pass", "reasoning": "Brief explanation"}
-
-Valid bid formats: Pass, X, XX, 1C, 1D, 1H, 1S, 1NT, 2C, 2D, 2H, 2S, 2NT, ... up to 7NT
-
-REMEMBER: ONLY JSON! No other text!`;
-
-              const res = await fetch("/api/bid", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ prompt })
-              });
-
-              if (!res.ok) throw new Error('API error');
-              const data = await res.json();
-              const text = data.content.find(c => c.type === 'text')?.text || '';
-              
-              // Clean and extract JSON more robustly
-              let clean = text.trim();
-              clean = clean.replace(/```json\s*/g, '').replace(/```\s*/g, '');
-              
-              // Try to extract JSON object if embedded in other text
-              const jsonMatch = clean.match(/\{[^{}]*"bid"[^{}]*"reasoning"[^{}]*\}/);
-              if (jsonMatch) {
-                clean = jsonMatch[0];
-              }
-              
-              console.log('Attempting to parse:', clean.substring(0, 100));
-              const result = JSON.parse(clean);
-              
-              // Sanitize bid format (convert symbols/words to standard format)
-              if (result.bid) {
-                // Handle double variations
-                if (result.bid.toUpperCase() === 'DOUBLE' || 
-                    result.bid.toUpperCase() === 'DBL' || 
-                    result.bid.toUpperCase() === 'D') {
-                  result.bid = 'X';
-                }
-                // Handle redouble variations  
-                else if (result.bid.toUpperCase() === 'REDOUBLE' || 
-                         result.bid.toUpperCase() === 'RDBL' || 
-                         result.bid.toUpperCase() === 'XX') {
-                  result.bid = 'XX';
-                }
-                // Convert suit symbols to letters
-                else if (result.bid !== 'Pass' && result.bid !== 'X' && result.bid !== 'XX') {
-                  result.bid = result.bid
-                    .replace(/♣/g, 'C')
-                    .replace(/♦/g, 'D')
-                    .replace(/♥/g, 'H')
-                    .replace(/♠/g, 'S')
-                    .toUpperCase();
-                }
-              }
-              
-              setThinking(false);
-              return result;
-            } catch (err) {
-              console.error('Claude bid error:', err);
-              setThinking(false);
-              return { bid: 'Pass', reasoning: 'Network issue - defaulting to Pass' };
-            }
+            setThinking(false);
+            return result;
           };
 
           // Track user's first bid via ref (avoids stale closure issues)
