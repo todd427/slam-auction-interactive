@@ -70,6 +70,49 @@
           return seats[(seats.indexOf(seat) + 1) % 4];
         };
 
+        const BIDDING_SYSTEMS = {
+          acol: {
+            id: 'acol',
+            name: 'ACOL',
+            label: 'ACOL (UK/Ireland)',
+            nt1Range: [12, 14],
+            majorCardMin: 4,
+            nt2Range: [20, 22],
+            lengthPoints: false,
+            preamble: `BIDDING SYSTEM: Standard English ACOL (UK/Ireland/NZ)
+KEY RULES:
+- 1NT opening = 12-14 HCP balanced (WEAK no trump)
+- Opening 1 of a major suit promises only 4+ cards (NOT 5)
+- Raising partner's major requires 4-card support (NOT 3)
+- 2NT opening = 20-22 HCP balanced
+- Do NOT add length points when valuing your hand`,
+          },
+          sayc: {
+            id: 'sayc',
+            name: 'SAYC',
+            label: 'Standard American (SAYC)',
+            nt1Range: [15, 17],
+            majorCardMin: 5,
+            nt2Range: [20, 21],
+            lengthPoints: true,
+            preamble: `BIDDING SYSTEM: Standard American Yellow Card (SAYC)
+KEY RULES:
+- 1NT opening = 15-17 HCP balanced (STRONG no trump)
+- Opening 1 of a major suit promises 5+ cards
+- Raising partner's major is acceptable with 3-card support
+- 2NT opening = 20-21 HCP balanced
+- Add 1 length point for each card above 4 in a suit`,
+          }
+        };
+
+        const detectSystem = () => {
+          const saved = localStorage.getItem('slam-bidding-system');
+          if (saved === 'acol' || saved === 'sayc') return saved;
+          const locale = navigator.language || '';
+          const acolLocales = ['en-GB', 'en-IE', 'en-NZ'];
+          return acolLocales.some(l => locale.startsWith(l)) ? 'acol' : 'sayc';
+        };
+
         // Scenarios with ALL 4 hands for full auction
         const SCENARIOS = [
           {
@@ -86,6 +129,7 @@
             alternatives: [],
             conventions: ["stayman"],
             teaching_point: "Use Stayman (2♣) to find 4-4 major fit",
+            acol_teaching_point: "Use Stayman (2♣) to find 4-4 major fit — in ACOL, opener's 1NT shows 12-14 HCP (weak), so game needs more from responder",
             optimal_contract: "4H by N"
           },
           {
@@ -102,6 +146,7 @@
             alternatives: [],
             conventions: ["transfers"],
             teaching_point: "Transfer to spades with 2♥",
+            acol_teaching_point: "Transfer to spades with 2♥ — in ACOL, opener's 1NT shows 12-14 HCP (weak), so combined values may only reach partscore",
             optimal_contract: "2S by N"
           },
           {
@@ -331,9 +376,15 @@
         const App = () => {
           const [view, setView] = useState('home');
           const [module, setModule] = useState('ALL');
-          const [startScenario, setStartScenario] = useState(0); // NEW: Which scenario to start on
+          const [startScenario, setStartScenario] = useState(0);
           const [results, setResults] = useState([]);
           const [score, setScore] = useState(0);
+          const [system, setSystem] = useState(detectSystem());
+
+          const handleSystemChange = (newSystem) => {
+            setSystem(newSystem);
+            localStorage.setItem('slam-bidding-system', newSystem);
+          };
 
           return (
             <div style={{
@@ -343,18 +394,21 @@
               padding: '40px 20px'
             }}>
               {view === 'home' && (
-                <HomeScreen 
-                  onStart={(m, scenarioIdx) => { 
-                    setModule(m); 
-                    setStartScenario(scenarioIdx); 
-                    setView('play'); 
-                  }} 
+                <HomeScreen
+                  system={system}
+                  onSystemChange={handleSystemChange}
+                  onStart={(m, scenarioIdx) => {
+                    setModule(m);
+                    setStartScenario(scenarioIdx);
+                    setView('play');
+                  }}
                 />
               )}
               {view === 'play' && (
-                <FullAuction 
+                <FullAuction
                   module={module}
                   startScenario={startScenario}
+                  system={system}
                   onComplete={(r, s) => { setResults(r); setScore(s); setView('summary'); }}
                   onHome={() => setView('home')}
                 />
@@ -366,9 +420,9 @@
           );
         };
 
-        const HomeScreen = ({ onStart }) => {
+        const HomeScreen = ({ onStart, system, onSystemChange }) => {
           const [selectedScenario, setSelectedScenario] = useState(0);
-          
+
           return (
           <div style={{ maxWidth: '900px', margin: '0 auto', textAlign: 'center' }}>
             <h1 style={{
@@ -384,6 +438,28 @@
             <p style={{ fontSize: '20px', color: '#94a3b8', marginBottom: '24px' }}>
               Full Interactive - Bid Multiple Times Throughout Auction
             </p>
+
+            <div style={{ marginBottom: '24px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '12px' }}>
+              <span style={{ color: '#94a3b8', fontSize: '14px' }}>Bidding system:</span>
+              {['acol', 'sayc'].map(s => (
+                <button
+                  key={s}
+                  onClick={() => onSystemChange(s)}
+                  style={{
+                    padding: '8px 16px',
+                    borderRadius: '8px',
+                    border: `1px solid ${system === s ? '#4ade80' : 'rgba(255,255,255,0.15)'}`,
+                    background: system === s ? 'rgba(74, 222, 128, 0.15)' : 'rgba(255,255,255,0.03)',
+                    color: system === s ? '#4ade80' : '#94a3b8',
+                    fontSize: '14px',
+                    fontWeight: system === s ? '600' : '400',
+                    cursor: 'pointer',
+                  }}
+                >
+                  {BIDDING_SYSTEMS[s].label}
+                </button>
+              ))}
+            </div>
             
             {/* Scenario Selector */}
             <div style={{ marginBottom: '32px' }}>
@@ -541,7 +617,7 @@
         );
 
         // FULL AUCTION COMPONENT - The main feature
-        const FullAuction = ({ module, startScenario = 0, onComplete, onHome }) => {
+        const FullAuction = ({ module, startScenario = 0, system, onComplete, onHome }) => {
           const scenarios = module === 'ALL' ? SCENARIOS : SCENARIOS.filter(s => s.module === module);
           const [idx, setIdx] = useState(startScenario);
           const [results, setResults] = useState([]);
@@ -645,7 +721,9 @@
               
               const handHCP = calculateHCP(scen.hands[seat]);
               
-              const prompt = `You are ${seat} playing bridge.
+              const prompt = `${BIDDING_SYSTEMS[system].preamble}
+
+You are ${seat} playing bridge.
 
 === PARTNERSHIPS ===
 YOUR PARTNER IS: ${partnership.partner}
@@ -789,12 +867,16 @@ REMEMBER: ONLY JSON! No other text!`;
               console.log('No userFirstBid, skipping scoring');
               return;
             }
-            
+
+            const correctBid = (system === 'acol' && scen.acol_correct_first_bid)
+              ? scen.acol_correct_first_bid
+              : scen.correct_first_bid;
+
             let points = 0;
-            if (userFirstBid === scen.correct_first_bid) points = 3;
+            if (userFirstBid === correctBid) points = 3;
             else if (scen.alternatives.includes(userFirstBid)) points = 2;
-            
-            console.log(`Scoring scenario ${scen.id}: userFirstBid=${userFirstBid}, correct=${scen.correct_first_bid}, points=${points}`);
+
+            console.log(`Scoring scenario ${scen.id}: userFirstBid=${userFirstBid}, correct=${correctBid}, points=${points}`);
             console.log(`Current totalScore: ${totalScore}, new totalScore: ${totalScore + points}`);
             
             setTotalScore(totalScore + points);
@@ -931,7 +1013,16 @@ REMEMBER: ONLY JSON! No other text!`;
                     </button>
                   </div>
                 </div>
-                <div style={{ fontSize: '16px', color: '#94a3b8', textAlign: 'center' }}>
+                <div style={{ fontSize: '16px', color: '#94a3b8', textAlign: 'center', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '12px' }}>
+                  <span style={{
+                    fontSize: '12px',
+                    color: '#4ade80',
+                    border: '1px solid rgba(74,222,128,0.3)',
+                    borderRadius: '4px',
+                    padding: '2px 8px'
+                  }}>
+                    {BIDDING_SYSTEMS[system].name}
+                  </span>
                   Scenario {idx + 1}/{scenarios.length} • Score: {totalScore}
                 </div>
               </div>
@@ -955,7 +1046,7 @@ REMEMBER: ONLY JSON! No other text!`;
                       fontSize: '14px',
                       color: '#22d3ee'
                     }}>
-                      💡 {scen.teaching_point}
+                      💡 {(system === 'acol' && scen.acol_teaching_point) ? scen.acol_teaching_point : scen.teaching_point}
                     </div>
                   )}
                 </div>
